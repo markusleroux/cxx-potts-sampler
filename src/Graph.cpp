@@ -1,8 +1,6 @@
 //
 // Created by Markus Le Roux on 2021-01-23.
 //
-
-#include <algorithm>
 #include "Graph.h"
 
 Graph::Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>>& edges) {

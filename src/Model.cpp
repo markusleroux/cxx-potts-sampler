@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "Graph.h"
 #include <algorithm>
 
 #define q 10
@@ -21,7 +20,7 @@ void Model::setColour(unsigned int v, unsigned int c) {
     }
 }
 
-std::vector<unsigned int> Model::getNeighbourhoodColourCount(unsigned int v) {
+std::vector<unsigned int> Model::getNeighbourhoodColourCount(unsigned int v) const {
     std::vector<unsigned int> count(q);
     for (int neighbour : getNeighboursIndex(v)) {
         count[getColour(neighbour)]++;
@@ -29,7 +28,7 @@ std::vector<unsigned int> Model::getNeighbourhoodColourCount(unsigned int v) {
     return count;
 }
 
-boost::dynamic_bitset<> Model::bs_getUnfixedColours(unsigned int v) {
+boost::dynamic_bitset<> Model::bs_getUnfixedColours(unsigned int v) const {
     boost::dynamic_bitset<> result(q);
     boost::dynamic_bitset<> boundingList(q);
 
@@ -47,20 +46,20 @@ boost::dynamic_bitset<> Model::bs_getUnfixedColours(unsigned int v) {
     return result;
 }
 
-std::vector<unsigned int> Model::getUnfixedColours(unsigned int v) {
+std::vector<unsigned int> Model::getUnfixedColours(unsigned int v) const {
     return getIndexVector<boost::dynamic_bitset<>>(bs_getUnfixedColours(v));
 }
 
-boost::dynamic_bitset<> Model::bs_getFixedColours(unsigned int v) {
+boost::dynamic_bitset<> Model::bs_getFixedColours(unsigned int v) const {
     boost::dynamic_bitset<> notResult = bs_getUnfixedColours(v);
     return ~notResult;
 }
 
-std::vector<unsigned int> Model::getFixedColours(unsigned int v) {
+std::vector<unsigned int> Model::getFixedColours(unsigned int v) const {
     return getIndexVector<boost::dynamic_bitset<>>(bs_getFixedColours(v));
 }
 
-unsigned int Model::m_Q(unsigned int v, unsigned int c) {
+unsigned int Model::m_Q(unsigned int v, unsigned int c) const {
     int result = 0;
     boost::dynamic_bitset<> boundingList(q);
 
@@ -72,7 +71,7 @@ unsigned int Model::m_Q(unsigned int v, unsigned int c) {
     return result;
 }
 
-unsigned int Model::m(unsigned int v, unsigned int c) { return getNeighbourhoodColourCount(v)[c]; }
+unsigned int Model::m(unsigned int v, unsigned int c) const { return getNeighbourhoodColourCount(v)[c]; }
 
 void Model::setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList) {
     boost::dynamic_bitset<> bs_boundingList(q);
@@ -87,7 +86,7 @@ void Model::setBoundingList(unsigned int v, const std::vector<unsigned int> &bou
     boundingChain[v] = bs_boundingList;
 }
 
-boost::dynamic_bitset<> Model::UnionOfBoundingLists(const std::vector<unsigned int> &vertices) {
+boost::dynamic_bitset<> Model::UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const {
     boost::dynamic_bitset<> result(q);
 
     // Iterate through the bounding lists of neighbours of v
@@ -108,7 +107,7 @@ boost::dynamic_bitset<> Model::atMostKUp(boost::dynamic_bitset<> bs, unsigned in
     return bs;
 }
 
-boost::dynamic_bitset<> Model::bs_generateA(unsigned int v, unsigned int size) {
+boost::dynamic_bitset<> Model::bs_generateA(unsigned int v, unsigned int size) const {
     assert(size <= q);
 
     std::vector<unsigned> vertices = getNeighboursIndex(v);

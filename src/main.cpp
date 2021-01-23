@@ -1,4 +1,4 @@
-#include "PottsModel.h"
+#include "Model.h"
 
 int main ()
 {

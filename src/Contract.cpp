@@ -7,6 +7,7 @@
 
 #define q 10
 #define B 0.5
+#define Delta 5
 
 Contract::Contract(Model &model, unsigned int v) : Update(model, v, handle_c1(v)) {
 	unfixedCount = model.bs_getUnfixedColours(v).count();
@@ -32,17 +33,23 @@ unsigned int Contract::handle_c1(unsigned int v) {
 }
 
 long double Contract::colouringGammaCutoff() const {
-	return 0;
+	std::vector<long double> weights = computeWeights(B, model.getNeighbourhoodColourCount(v));
+	long double Z = std::accumulate(weights.begin(), weights.end(), (long double) 0.0);
+	return pow(B, weights[c1])*unfixedCount / Z;
 }
 
 long double Contract::boundingListGammaCutoff() const {
-	return 0;
+	return model.bs_getUnfixedColours(v).count() / (q - Delta * (1 - B));
 }
 
 void Contract::updateColouring() {
-
+	if (gamma >= colouringGammaCutoff()) {
+		model.setColour(v, c1);
+	} else { model.setColour(v, c2); }
 }
 
 void Contract::updateBoundingChain() {
-
+	if (gamma > boundingListGammaCutoff()) {
+		model.setBoundingList(v, {c1});
+	} else { model.setBoundingList(v, {c1, c2}); }
 }

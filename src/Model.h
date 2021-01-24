@@ -6,6 +6,7 @@
 #define POTTSSAMPLER_MODEL_H
 
 #include "Graph.h"
+#include <random>
 
 // TODO: t_boundinglist
 //  - bounding list should be a class
@@ -17,12 +18,14 @@ class Model : public Graph {
     private:
         std::vector<unsigned> colouring;
         std::vector<boost::dynamic_bitset<>> boundingChain;
+		static std::mt19937 mersene_gen;
 
         static boost::dynamic_bitset<> atMostKUp(boost::dynamic_bitset<> bs, unsigned int k);
         boost::dynamic_bitset<> bs_getUnfixedColours(unsigned int v) const;
         boost::dynamic_bitset<> bs_getFixedColours(unsigned int v) const;
         boost::dynamic_bitset<> UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const;
 
+        friend class Update;
         friend class Compress;
         friend class Contract;
 

@@ -3,6 +3,9 @@
 
 #define q 10
 
+
+std::mt19937 Model::mersene_gen{std::random_device{}()};
+
 // Define model constructor
 Model::Model(unsigned int n, const std::list<std::pair<unsigned, unsigned>>& edges) : Graph(n, edges) {
     // Initialize vector of colours

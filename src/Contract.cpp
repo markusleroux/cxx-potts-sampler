@@ -10,12 +10,15 @@
 
 Contract::Contract(Model &model, unsigned int v) : Update(model, v, handle_c1(v)) {
 	unfixedCount = model.bs_getUnfixedColours(v).count();
+
 	std::vector<long double> weights(q, 0);
 
 //	TODO: see similarity with Update::computeWeights
 	for (unsigned c : model.getFixedColours(v)) {
-		weights[c] = pow(B, model.m_Q(v, c));
+		weights[c] = (long double) pow(B, model.m_Q(v, c));
 	}
+
+	std::vector<unsigned int> w(q, 0);
 
 	c2 = sampleFromDist<long double>(weights);
 }

@@ -10,13 +10,8 @@
 #include "Model.h"
 
 class Update {
-	private:
-		static std::mt19937 mersene_gen;
-
 	protected:
         explicit Update(Model &model, unsigned v, unsigned c1) : v(v), c1(c1), model(model) {}
-
-        static long double unit_dist();
 		static std::vector<long double> computeWeights(long double B, std::vector<unsigned> counts);
 
         virtual void updateColouring() = 0;
@@ -33,8 +28,12 @@ class Update {
 
 	public:
 		template <typename T>
-		static unsigned int sampleFromDist(const std::vector<T>& weights);
+		static unsigned int sampleFromDist(const std::vector<T>& weights) {
+			std::discrete_distribution<unsigned int> dist(weights.begin(), weights.end());
+			return dist(Model::mersene_gen);
+		}
 
+		static long double unit_dist();
 		static unsigned int bs_uniformSample(const boost::dynamic_bitset<> &bs);
 };
 

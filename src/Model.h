@@ -7,6 +7,12 @@
 
 #include "Graph.h"
 
+// TODO: t_boundinglist
+//  - bounding list should be a class
+//  - atMostKUp as method
+//  - qComplement as method
+//  - Graph::getIndexVector moved to super class
+
 class Model : public Graph {
     private:
         std::vector<unsigned> colouring;
@@ -29,11 +35,20 @@ class Model : public Graph {
         unsigned int m(unsigned int v, unsigned int c) const;
 
         boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
-        void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
+        std::vector<unsigned> getBoundingListIndex(unsigned int v) const { return getIndexVector(getBoundingList(v)); }
+        void setBoundingList(unsigned int v, std::vector<unsigned int> &boundingList);
         std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
         unsigned int m_Q(unsigned int v, unsigned int c) const;
         
         boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
 };
+
+// Overload << to print adjacency matrix
+static std::ostream& operator<< (std::ostream &out, const Model &model) {
+    for (unsigned v = 0; v < model.getSize(); v++) {
+        out << v << " (" << model.getColour(v) << ") : [" << model.getBoundingListIndex(v) << "]\n";
+    }
+    return out;
+}
 
 #endif //POTTSSAMPLER_MODEL_H

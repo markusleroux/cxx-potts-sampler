@@ -11,7 +11,6 @@
 #include <boost/dynamic_bitset.hpp>
 
 class Graph {
-
     std::vector<std::vector<bool>> adjacencyMatrix;
 
     protected:
@@ -34,11 +33,10 @@ class Graph {
 };
 
 // Overload << to print vector contents
-// TODO: trailing comma
-template <typename T>
-static std::ostream& operator<<(std::ostream& out, const std::vector<T> &vector)
+
+static std::ostream& operator<<(std::ostream& out, const std::vector<unsigned int> &vector)
 {
-    for (const auto &value : vector) { out << value << ","; }
+    for (unsigned value : vector) { out << value << ","; }
     return out;
 }
 

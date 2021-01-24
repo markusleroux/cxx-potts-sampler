@@ -13,23 +13,22 @@
 class Graph {
     std::vector<std::vector<bool>> adjacencyMatrix;
 
-    protected:
-        template <typename bitset_t>
-        std::vector<unsigned> getIndexVector(bitset_t bs) const {
-            std::vector<unsigned> result;
-            for (int i = 0; i < bs.size(); i++) {
-                if (bs[i]) { result.push_back(i); }
-            }
-            return result;
-        }
-
-    public:
+	public:
         Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>>& edges);
 
         unsigned getSize() const { return adjacencyMatrix.size(); }
         std::vector<bool> getNeighboursBool(unsigned v) const { return adjacencyMatrix[v]; }
         std::vector<unsigned int> getNeighboursIndex(unsigned v) const { return getIndexVector<std::vector<bool>>(getNeighboursBool((v))); }
         std::vector<std::vector<bool>> getAdjacencyMatrix() const { return adjacencyMatrix; }
+
+		template <typename bitset_t>
+		static std::vector<unsigned> getIndexVector(bitset_t bs) {
+		    std::vector<unsigned> result;
+		    for (int i = 0; i < bs.size(); i++) {
+		        if (bs[i]) { result.push_back(i); }
+		    }
+		    return result;
+		}
 };
 
 // Overload << to print vector contents

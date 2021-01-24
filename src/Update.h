@@ -10,20 +10,21 @@
 #include "Model.h"
 
 class Update {
-    private:
-        Model &model;
-        const unsigned v;
-        const long double gamma = unit_dist();
-        const unsigned c_1;
 
-    protected:
+	protected:
         explicit Update(Model &model, unsigned v, unsigned c_1) : v(v), c_1(c_1), model(model) {}
-        static long double unit_dist();
 
+        static long double unit_dist();
         static unsigned int bs_sample(const boost::dynamic_bitset<>& bs);
+		static std::vector<long double> computeWeights(long double B, std::vector<unsigned> counts);
 
         virtual void updateColouring() = 0;
         virtual void updateBoundingChain() = 0;
+
+		Model &model;
+		const unsigned v;
+		const unsigned c_1;
+		const long double gamma = unit_dist();
 };
 
 

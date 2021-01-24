@@ -28,3 +28,8 @@ unsigned int Update::bs_sample(const boost::dynamic_bitset<>& bs) {
 
     return i;
 }
+
+std::vector<long double> Update::computeWeights(long double B, std::vector<unsigned int> counts) {
+	std::vector<long double> weights(counts.size());
+	std::transform(counts.begin(), counts.end(), weights.begin(), [B](unsigned int m_c){ return pow(B, m_c); });
+}

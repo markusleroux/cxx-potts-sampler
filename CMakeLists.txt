@@ -18,4 +18,4 @@ FATAL: In-source builds are not allowed.
 endif()
 
 include_directories(/usr/local/Cellar/boost/1.75.0_1/include)
-add_executable(sampler src/main.cpp src/Model.cpp src/Model.h src/Graph.cpp src/Graph.h src/Compress.cpp src/Compress.h src/Update.h src/Update.cpp)
+add_executable(sampler src/main.cpp src/Model.cpp src/Model.h src/Graph.cpp src/Graph.h src/Compress.cpp src/Compress.h src/Update.h src/Update.cpp src/Contract.cpp src/Contract.h)

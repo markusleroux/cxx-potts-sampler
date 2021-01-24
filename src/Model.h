@@ -23,6 +23,9 @@ class Model : public Graph {
         boost::dynamic_bitset<> bs_getFixedColours(unsigned int v) const;
         boost::dynamic_bitset<> UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const;
 
+        friend class Compress;
+        friend class Contract;
+
     public:
         Model(unsigned int n, const std::list<std::pair<unsigned int, unsigned int>>& edges);
         int getColour(unsigned int v) const { return colouring[v]; }
@@ -36,7 +39,7 @@ class Model : public Graph {
 
         boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
         std::vector<unsigned> getBoundingListIndex(unsigned int v) const { return getIndexVector(getBoundingList(v)); }
-        void setBoundingList(unsigned int v, std::vector<unsigned int> &boundingList);
+        void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
         std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
         unsigned int m_Q(unsigned int v, unsigned int c) const;
         

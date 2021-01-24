@@ -19,6 +19,9 @@ class Compress : public Update {
 
 	public:
         Compress(Model &model, unsigned int v, const boost::dynamic_bitset<>& bs_A);
+
+		void updateColouring() override;
+		void updateBoundingChain() override;
 };
 
 

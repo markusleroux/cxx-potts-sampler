@@ -73,7 +73,7 @@ unsigned int Model::m_Q(unsigned int v, unsigned int c) const {
 
 unsigned int Model::m(unsigned int v, unsigned int c) const { return getNeighbourhoodColourCount(v)[c]; }
 
-void Model::setBoundingList(unsigned int v, std::vector<unsigned int> &boundingList) {
+void Model::setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList) {
     boost::dynamic_bitset<> bs_boundingList(q);
     for (unsigned colour : boundingList) {
         if (colour >= 0 && colour < q) {

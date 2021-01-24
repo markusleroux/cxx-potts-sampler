@@ -6,18 +6,19 @@
 #include "Model.h"
 #include "Update.h"
 
+// TODO: deal with parameters
 #define q 10
 #define B 0.5
 #define Delta 5
 
 Compress::Compress(Model &model,
 				   unsigned int v,
-				   const boost::dynamic_bitset<>& bs_A) : Update(model, v, bs_sample(~bs_A)) {};
+				   const boost::dynamic_bitset<>& bs_A) : Update(model, v, bs_uniformSample(~bs_A)) {};
 
 long double Compress::gammaCutoff() const {
 	std::vector<long double> weights = computeWeights(B, model.getNeighbourhoodColourCount(v));
 	long double Z = std::accumulate(weights.begin(), weights.end(), (long double) 0.0);
-	return (q - Delta) * weights[c_1] / Z;
+	return (q - Delta) * weights[c1] / Z;
 }
 
 unsigned int Compress::sampleFromA() const {
@@ -37,4 +38,20 @@ unsigned int Compress::sampleFromA() const {
 	}
 
 	throw std::runtime_error("No sample generated from A (likely caused by rounding error).");
+}
+
+void Compress::updateColouring() {
+	if (gamma < gammaCutoff()) {
+		model.setColour(v, c1);
+	} else {
+		model.setColour(v, sampleFromA());
+	}
+}
+
+void Compress::updateBoundingChain() {
+	boost::dynamic_bitset<> bs(q);
+	bs.set(c1);
+
+	std::vector<unsigned int> vec_A = Model::getIndexVector<boost::dynamic_bitset<>>(A | bs);
+	model.setBoundingList(v, vec_A);
 }

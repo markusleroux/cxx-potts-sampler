@@ -17,6 +17,14 @@ class Graph {
         Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>>& edges);
 
         unsigned getSize() const { return adjacencyMatrix.size(); }
+        unsigned getEdgeCount() const {
+        	unsigned int total = 0;
+        	for (std::vector<bool> neighbours : adjacencyMatrix ) {
+        		total += std::count(neighbours.begin(), neighbours.end(), true);
+        	}
+        	return total / 2;
+        }
+
         std::vector<bool> getNeighboursBool(unsigned v) const { return adjacencyMatrix[v]; }
         std::vector<unsigned int> getNeighboursIndex(unsigned v) const { return getIndexVector<std::vector<bool>>(getNeighboursBool((v))); }
         std::vector<std::vector<bool>> getAdjacencyMatrix() const { return adjacencyMatrix; }

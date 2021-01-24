@@ -23,4 +23,4 @@ add_executable(sampler src/main.cpp
                        src/Graph.cpp src/Graph.h
                        src/Compress.cpp src/Compress.h
                        src/Contract.cpp src/Contract.h
-                       src/Update.h src/Update.cpp)
+                       src/Update.h src/Update.cpp src/Sampler.cpp src/Sampler.h)

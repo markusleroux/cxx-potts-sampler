@@ -35,7 +35,7 @@ unsigned int Contract::handle_c1(unsigned int v) {
 long double Contract::colouringGammaCutoff() const {
 	std::vector<long double> weights = computeWeights(B, model.getNeighbourhoodColourCount(v));
 	long double Z = std::accumulate(weights.begin(), weights.end(), (long double) 0.0);
-	return pow(B, weights[c1])*unfixedCount / Z;
+	return pow(B, weights[c1]) * unfixedCount / Z;
 }
 
 long double Contract::boundingListGammaCutoff() const {

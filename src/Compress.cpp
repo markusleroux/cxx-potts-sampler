@@ -7,12 +7,13 @@
 #include "Update.h"
 
 Compress::Compress(Model &model,
-				   unsigned int v,
-				   const boost::dynamic_bitset<>& bs_A) : Compress(model, v, bs_uniformSample(~bs_A), bs_A) {};
+                   unsigned int v,
+                   const boost::dynamic_bitset<> &bs_A) : Compress(model, v, bs_uniformSample(~bs_A), bs_A) {};
+
 Compress::Compress(Model &model,
-				   unsigned int v,
-				   unsigned int c1,
-				   const boost::dynamic_bitset<>& bs_A) : Update(model, v, c1), A(bs_A) {};
+                   unsigned int v,
+                   unsigned int c1,
+                   const boost::dynamic_bitset<> &bs_A) : Update(model, v, c1), A(bs_A) {};
 
 long double Compress::gammaCutoff() const {
 	std::vector<long double> weights = computeWeights(model.B, model.getNeighbourhoodColourCount(v));

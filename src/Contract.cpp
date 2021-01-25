@@ -6,6 +6,7 @@
 #include "Update.h"
 
 Contract::Contract(Model &model, unsigned int v) : Contract(model, v, handle_c1(model, v)) {}
+
 Contract::Contract(Model &m, unsigned int v, unsigned int c1) : Update(m, v, c1) {
 	unfixedCount = model.bs_getUnfixedColours(v).count();
 
@@ -22,7 +23,7 @@ Contract::Contract(Model &m, unsigned int v, unsigned int c1) : Update(m, v, c1)
 unsigned int Contract::handle_c1(Model &m, unsigned int v) {
 	try {
 		return bs_uniformSample(m.bs_getUnfixedColours(v));
-	} catch (const std::invalid_argument & e) {
+	} catch (const std::invalid_argument &e) {
 		return 0;
 	}
 }

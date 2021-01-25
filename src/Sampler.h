@@ -21,26 +21,21 @@ class Sampler {
 		std::vector<std::vector<boost::variant<Compress, Contract>>> history;
 
 		std::vector<boost::variant<Compress, Contract>> iteration();
+
 		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract>> &seeds);
 
-		void writeHistory(const std::vector<boost::variant<Compress, Contract>> &seeds) {
-			history.emplace_back(seeds);
-		}
+		void writeHistory(const std::vector<boost::variant<Compress, Contract>> &seeds) { history.emplace_back(seeds); }
 
-		bool boundingChainIsConstant() const {
-			std::vector<boost::dynamic_bitset<>> boundingChain = model.getBoundingChain();
-			return std::all_of(boundingChain.begin(), boundingChain.end(), [](const boost::dynamic_bitset<> &bs){ return bs.count() == 1; });
-		}
+		bool boundingChainIsConstant() const;
 
 //		static function for use in constructor
-		static unsigned int generateT(const Model &m) {
-			unsigned int n = m.getSize();
-			return n + 1 + m.getEdgeCount() + (unsigned int) (pow(n, 2) * (m.q - m.Delta * (1 - m.B) / (m.q - m.Delta * (3 - m.B))));
-		}
+		static unsigned int generateT(const Model &m);
+
 		unsigned int generateT() { return generateT(model); }
 
 	public:
 		explicit Sampler(Model &model) : Sampler(model, generateT(model)) {};
+
 		Sampler(Model &model, unsigned int T) : model(model), T(T) {};
 
 		void sample();

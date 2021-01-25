@@ -14,12 +14,15 @@ class Contract : public Update {
 
 	public:
 		Contract(Model &model, unsigned int v);
+
 		Contract(Model &model, unsigned int v, unsigned int c1);
 
 		long double colouringGammaCutoff() const;
+
 		long double boundingListGammaCutoff() const;
 
 		void updateColouring() override;
+
 		void updateBoundingChain() override;
 
 		static unsigned int handle_c1(Model &model, unsigned int v);

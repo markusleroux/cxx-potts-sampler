@@ -9,8 +9,8 @@
 
 class updateVisitor : public boost::static_visitor<> {
 	public:
-		template <typename T>
-		void operator()(T & update) const {
+		template<typename T>
+		void operator()(T &update) const {
 			update.updateColouring();
 		}
 };
@@ -58,4 +58,16 @@ void Sampler::sample() {
 	for (auto it = ++history.rbegin(); it != history.rend(); it++) {
 		updateColourWithSeeds(*it);
 	}
+}
+
+unsigned int Sampler::generateT(const Model &m) {
+	unsigned int n = m.getSize();
+	return n + 1 + m.getEdgeCount() +
+	       (unsigned int) (pow(n, 2) * (m.q - m.Delta * (1 - m.B) / (m.q - m.Delta * (3 - m.B))));
+}
+
+bool Sampler::boundingChainIsConstant() const {
+	std::vector<boost::dynamic_bitset<>> boundingChain = model.getBoundingChain();
+	return std::all_of(boundingChain.begin(), boundingChain.end(),
+	                   [](const boost::dynamic_bitset<> &bs) { return bs.count() == 1; });
 }

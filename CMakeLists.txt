@@ -17,8 +17,6 @@ FATAL: In-source builds are not allowed.
 ")
 endif()
 
-#include_directories(/usr/local/Cellar/boost/1.75.0_1/include)
-
 find_package(Boost 1.40 COMPONENTS program_options REQUIRED)
 
 add_executable(sampler src/main.cpp
@@ -26,6 +24,7 @@ add_executable(sampler src/main.cpp
                        src/Graph.cpp src/Graph.h
                        src/Compress.cpp src/Compress.h
                        src/Contract.cpp src/Contract.h
-                       src/Update.h src/Update.cpp src/Sampler.cpp src/Sampler.h)
+                       src/Update.h src/Update.cpp
+                       src/Sampler.cpp src/Sampler.h)
 
 target_link_libraries(sampler Boost::program_options)

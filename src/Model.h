@@ -12,37 +12,50 @@
 //  - bounding list should be a class
 //  - atMostKUp as method
 //  - qComplement as method
-//  - Graph::getIndexVector moved to super class
+//  - Graph::getIndexVector moved
 
 class Model : public Graph {
-    private:
-        std::vector<unsigned> colouring;
+	private:
+		std::vector<unsigned> colouring;
+
+//      TODO: consider:
+//       - Model::Delta -> Graph::Delta
+//       - Model::B -> Sampler::B
+//      Parameters:
 		unsigned int q;
 		unsigned int Delta;
 		long double B;
 
-        std::vector<boost::dynamic_bitset<>> boundingChain;
+
+		std::vector<boost::dynamic_bitset<>> boundingChain;
 		static std::mt19937 mersene_gen;
 		bool checkBoundingList = true;
 
-        static boost::dynamic_bitset<> atMostKUp(boost::dynamic_bitset<> bs, unsigned int k);
-        boost::dynamic_bitset<> bs_getUnfixedColours(unsigned int v) const;
-        boost::dynamic_bitset<> bs_getFixedColours(unsigned int v) const;
-        boost::dynamic_bitset<> UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const;
+		static boost::dynamic_bitset<> atMostKUp(boost::dynamic_bitset<> bs, unsigned int k);
 
-        friend class Update;
-        friend class Compress;
-        friend class Contract;
-        friend class Sampler;
+		boost::dynamic_bitset<> bs_getUnfixedColours(unsigned int v) const;
 
-    public:
-        Model(unsigned int n,
-			  unsigned int q,
-			  unsigned int Delta,
-			  long double B,
-			  const std::list<std::pair<unsigned int, unsigned int>>& edges);
+		boost::dynamic_bitset<> bs_getFixedColours(unsigned int v) const;
+
+		boost::dynamic_bitset<> UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const;
+
+		friend class Update;
+
+		friend class Compress;
+
+		friend class Contract;
+
+		friend class Sampler;
+
+	public:
+		Model(unsigned int n,
+		      unsigned int q,
+		      unsigned int Delta,
+		      long double B,
+		      const std::list<std::pair<unsigned int, unsigned int>> &edges);
+
 //      Constructor for default types
-		static Model genericModelConstructor(const std::string& type,
+		static Model genericModelConstructor(const std::string &type,
 		                                     unsigned int n,
 		                                     unsigned int q,
 		                                     unsigned int Delta,
@@ -64,33 +77,43 @@ class Model : public Graph {
 			return Model(n, q, Delta, B, edges);
 		}
 
-        int getColour(unsigned int v) const { return colouring[v]; }
-        void setColour(unsigned int v, unsigned int c);
+		int getColour(unsigned int v) const { return colouring[v]; }
 
-        std::vector<unsigned int> getColouring() { return colouring; }
-        std::vector<unsigned int> getUnfixedColours(unsigned int v) const;
-        std::vector<unsigned int> getFixedColours(unsigned int v) const;
-        std::vector<unsigned int> getNeighbourhoodColourCount(unsigned int v) const;
-        unsigned int m(unsigned int v, unsigned int c) const;
+		void setColour(unsigned int v, unsigned int c);
 
-        void setBoundingListChecks(bool b) { checkBoundingList = b; }
-        boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
-        std::vector<unsigned> getBoundingListIndex(unsigned int v) const { return getIndexVector(getBoundingList(v)); }
-        void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
-        std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
-        unsigned int m_Q(unsigned int v, unsigned int c) const;
-        
-        boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
+		std::vector<unsigned int> getColouring() { return colouring; }
 
-        void sample();
+		std::vector<unsigned int> getUnfixedColours(unsigned int v) const;
+
+		std::vector<unsigned int> getFixedColours(unsigned int v) const;
+
+		std::vector<unsigned int> getNeighbourhoodColourCount(unsigned int v) const;
+
+		unsigned int m(unsigned int v, unsigned int c) const;
+
+		void setBoundingListChecks(bool b) { checkBoundingList = b; }
+
+		boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
+
+		std::vector<unsigned> getBoundingListIndex(unsigned int v) const { return getIndexVector(getBoundingList(v)); }
+
+		void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
+
+		std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
+
+		unsigned int m_Q(unsigned int v, unsigned int c) const;
+
+		boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
+
+		void sample();
 };
 
 // Overload <<
-static std::ostream& operator<< (std::ostream &out, const Model &model) {
-    for (unsigned v = 0; v < model.getSize(); v++) {
-        out << v << " (" << model.getColour(v) << ") : {" << model.getNeighboursIndex(v) << "}\n";
-    }
-    return out;
+static std::ostream &operator<<(std::ostream &out, const Model &model) {
+	for (unsigned v = 0; v < model.getSize(); v++) {
+		out << v << " (" << model.getColour(v) << ") : {" << model.getNeighboursIndex(v) << "}\n";
+	}
+	return out;
 }
 
 #endif //POTTSSAMPLER_MODEL_H

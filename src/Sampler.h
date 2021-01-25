@@ -12,10 +12,6 @@
 #include "Compress.h"
 #include "Contract.h"
 
-#define q 10
-#define B 0.5
-#define Delta 5
-
 class Sampler {
 	private:
 		Model &model;
@@ -39,7 +35,7 @@ class Sampler {
 //		static function for use in constructor
 		static unsigned int generateT(const Model &m) {
 			unsigned int n = m.getSize();
-			return n + 1 + m.getEdgeCount() + (unsigned int) (pow(n, 2) * (q - Delta * (1 - B) / (q - Delta * (3 - B))));
+			return n + 1 + m.getEdgeCount() + (unsigned int) (pow(n, 2) * (m.q - m.Delta * (1 - m.B) / (m.q - m.Delta * (3 - m.B))));
 		}
 		unsigned int generateT() { return generateT(model); }
 
@@ -47,11 +43,7 @@ class Sampler {
 		explicit Sampler(Model &model) : Sampler(model, generateT(model)) {};
 		Sampler(Model &model, unsigned int T) : model(model), T(T) {};
 
-
 		void sample();
-		static bool checkParameters() {
-			return (q > 2 * Delta) && (Delta >= 3) && (B > 1 - (long double)(q - 2 * Delta) / Delta) && (B < 1);
-		}
 };
 
 

@@ -2,13 +2,14 @@
 #include "Sampler.h"
 #include <algorithm>
 
-#define q 10
-
-
 std::mt19937 Model::mersene_gen{std::random_device{}()};
 
 // Define model constructor
-Model::Model(unsigned int n, const std::list<std::pair<unsigned, unsigned>>& edges) : Graph(n, edges) {
+Model::Model(unsigned int n,
+			 unsigned int q,
+			 unsigned int Delta,
+			 long double B,
+			 const std::list<std::pair<unsigned, unsigned>>& edges) : Graph(n, edges), q(q), Delta(Delta), B(B) {
     // Initialize vector of colours
     colouring = std::vector<unsigned int>(n);
 

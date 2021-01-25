@@ -27,7 +27,7 @@ std::vector<boost::variant<Compress, Contract>> Sampler::iteration() {
 //	Phase One
 	boost::dynamic_bitset<> A;
 	for (unsigned int v = 0; v < model.getSize(); v++) {
-		A = model.bs_generateA(v, Delta);
+		A = model.bs_generateA(v, model.Delta);
 		for (unsigned int w : model.getNeighboursIndex(v)) {
 			if (w > v) {
 				seeds.emplace_back(Compress(model, w, A));
@@ -53,6 +53,7 @@ std::vector<boost::variant<Compress, Contract>> Sampler::iteration() {
 void Sampler::sample() {
 	for (unsigned int t = 0; not boundingChainIsConstant(); t++) { writeHistory(iteration()); }
 
+	std::cout << "multi it";
 	model.setBoundingListChecks(false);
 	for (auto it = ++history.rbegin(); it != history.rend(); it++) {
 		updateColourWithSeeds(*it);

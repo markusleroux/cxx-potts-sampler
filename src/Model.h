@@ -17,6 +17,10 @@
 class Model : public Graph {
     private:
         std::vector<unsigned> colouring;
+		unsigned int q;
+		unsigned int Delta;
+		long double B;
+
         std::vector<boost::dynamic_bitset<>> boundingChain;
 		static std::mt19937 mersene_gen;
 		bool checkBoundingList = true;
@@ -29,9 +33,37 @@ class Model : public Graph {
         friend class Update;
         friend class Compress;
         friend class Contract;
+        friend class Sampler;
 
     public:
-        Model(unsigned int n, const std::list<std::pair<unsigned int, unsigned int>>& edges);
+        Model(unsigned int n,
+			  unsigned int q,
+			  unsigned int Delta,
+			  long double B,
+			  const std::list<std::pair<unsigned int, unsigned int>>& edges);
+//      Constructor for default types
+		static Model genericModelConstructor(const std::string& type,
+		                                     unsigned int n,
+		                                     unsigned int q,
+		                                     unsigned int Delta,
+		                                     long double B) {
+			std::list<std::pair<unsigned, unsigned>> edges;
+			if (type == "cycle") {
+				for (int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
+				if (n > 2) { edges.emplace_back(n - 1, 0); }
+			} else if (type == "complete") {
+				for (int i = 0; i < n; i++) {
+					for (int j = 0; j < n; j++) {
+						if (j != i) { edges.emplace_back(i, j); }
+					}
+				}
+			} else {
+				throw std::invalid_argument("Invalid graph type.");
+			}
+
+			return Model(n, q, Delta, B, edges);
+		}
+
         int getColour(unsigned int v) const { return colouring[v]; }
         void setColour(unsigned int v, unsigned int c);
 

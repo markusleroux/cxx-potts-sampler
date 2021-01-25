@@ -19,6 +19,7 @@ class Model : public Graph {
         std::vector<unsigned> colouring;
         std::vector<boost::dynamic_bitset<>> boundingChain;
 		static std::mt19937 mersene_gen;
+		bool checkBoundingList = true;
 
         static boost::dynamic_bitset<> atMostKUp(boost::dynamic_bitset<> bs, unsigned int k);
         boost::dynamic_bitset<> bs_getUnfixedColours(unsigned int v) const;
@@ -40,6 +41,7 @@ class Model : public Graph {
         std::vector<unsigned int> getNeighbourhoodColourCount(unsigned int v) const;
         unsigned int m(unsigned int v, unsigned int c) const;
 
+        void setBoundingListChecks(bool b) { checkBoundingList = b; }
         boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
         std::vector<unsigned> getBoundingListIndex(unsigned int v) const { return getIndexVector(getBoundingList(v)); }
         void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
@@ -47,12 +49,14 @@ class Model : public Graph {
         unsigned int m_Q(unsigned int v, unsigned int c) const;
         
         boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
+
+        void sample();
 };
 
-// Overload << to print adjacency matrix
+// Overload <<
 static std::ostream& operator<< (std::ostream &out, const Model &model) {
     for (unsigned v = 0; v < model.getSize(); v++) {
-        out << v << " (" << model.getColour(v) << ") : [" << model.getBoundingListIndex(v) << "]\n";
+        out << v << " (" << model.getColour(v) << ") : {" << model.getNeighboursIndex(v) << "}\n";
     }
     return out;
 }

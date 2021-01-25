@@ -11,20 +11,16 @@
 
 class Update {
 	protected:
-        explicit Update(Model &model, unsigned v, unsigned c1) : v(v), c1(c1), model(model) {}
+        explicit Update(Model &m, unsigned v, unsigned c1) : v(v), c1(c1), model(m) {}
 		static std::vector<long double> computeWeights(long double B, std::vector<unsigned> counts);
 
         virtual void updateColouring() = 0;
         virtual void updateBoundingChain() = 0;
-		void update() {
-			updateBoundingChain();
-			updateColouring();
-		}
 
 		Model &model;
 		const unsigned v;
 		const unsigned c1;
-		const long double gamma = unit_dist();
+		const long double gamma = unitDist();
 
 	public:
 		template <typename T>
@@ -33,8 +29,13 @@ class Update {
 			return dist(Model::mersene_gen);
 		}
 
-		static long double unit_dist();
+		static long double unitDist();
 		static unsigned int bs_uniformSample(const boost::dynamic_bitset<> &bs);
+
+		void update() {
+			updateBoundingChain();
+			updateColouring();
+		}
 };
 
 

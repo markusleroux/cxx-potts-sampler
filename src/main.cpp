@@ -1,9 +1,10 @@
 #include "Model.h"
+#include "Contract.h"
 
 int main ()
 {
-    std::list<std::pair<unsigned, unsigned>> l = {std::pair<unsigned, unsigned>(1, 2),
-                                                  std::pair<unsigned, unsigned>(1, 3)};
+    std::list<std::pair<unsigned, unsigned>> l = {};
     Model m(10, l);
-    std::cout << m;
+    m.sample();
+	std::cout << m;
 }

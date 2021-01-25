@@ -7,7 +7,7 @@
 #include "Model.h"
 #include "Update.h"
 
-long double Update::unit_dist() {
+long double Update::unitDist() {
     static std::uniform_real_distribution<double> dist(0.0, 1.0);
 
     return dist(Model::mersene_gen);

@@ -40,8 +40,8 @@ class Graph {
 };
 
 // Overload << to print vector contents
-
-static std::ostream& operator<<(std::ostream& out, const std::vector<unsigned int> &vector)
+template <typename T>
+static std::ostream& operator<<(std::ostream& out, const std::vector<T> &vector)
 {
     for (unsigned value : vector) { out << value << ","; }
     return out;

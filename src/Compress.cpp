@@ -13,7 +13,11 @@
 
 Compress::Compress(Model &model,
 				   unsigned int v,
-				   const boost::dynamic_bitset<>& bs_A) : Update(model, v, bs_uniformSample(~bs_A)) {};
+				   const boost::dynamic_bitset<>& bs_A) : Compress(model, v, bs_uniformSample(~bs_A), bs_A) {};
+Compress::Compress(Model &model,
+				   unsigned int v,
+				   unsigned int c1,
+				   const boost::dynamic_bitset<>& bs_A) : Update(model, v, c1), A(bs_A) {};
 
 long double Compress::gammaCutoff() const {
 	std::vector<long double> weights = computeWeights(B, model.getNeighbourhoodColourCount(v));
@@ -29,10 +33,10 @@ unsigned int Compress::sampleFromA() const {
 		if (A[i]) { Z += weights[i]; }
 	}
 
-	long double gammaTimesDenominator = gamma * Z;
+	long double tau_x_Denominator = gamma * Z;
 	long double total = 0;
 	for (unsigned int c : Model::getIndexVector<boost::dynamic_bitset<>>(A)) {
-		if (total + weights[c] > gammaTimesDenominator) {
+		if (total + weights[c] > tau_x_Denominator) {
 			return c;
 		} else { total += weights[c]; }
 	}
@@ -49,7 +53,7 @@ void Compress::updateColouring() {
 }
 
 void Compress::updateBoundingChain() {
-	boost::dynamic_bitset<> bs(q);
+	boost::dynamic_bitset<> bs(q, 0);
 	bs.set(c1);
 
 	std::vector<unsigned int> vec_A = Model::getIndexVector<boost::dynamic_bitset<>>(A | bs);

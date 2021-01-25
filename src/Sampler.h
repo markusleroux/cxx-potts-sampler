@@ -18,17 +18,17 @@
 
 class Sampler {
 	private:
-		Model model;
+		Model &model;
 		unsigned int T;
 
 //		TODO: optimize to use pointers or avoid unnecessary copies
 		std::vector<std::vector<boost::variant<Compress, Contract>>> history;
 
 		std::vector<boost::variant<Compress, Contract>> iteration();
-		void updateColourWithSeeds(const std::vector<boost::variant<Compress, Contract>> &seeds);
+		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract>> &seeds);
 
 		void writeHistory(const std::vector<boost::variant<Compress, Contract>> &seeds) {
-			history.push_back(seeds);
+			history.emplace_back(seeds);
 		}
 
 		bool boundingChainIsConstant() const {

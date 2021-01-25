@@ -9,12 +9,12 @@
 
 class Contract : public Update {
 	private:
-		const boost::dynamic_bitset<> A;
 		unsigned int unfixedCount;
 		unsigned int c2;
 
 	public:
 		Contract(Model &model, unsigned int v);
+		Contract(Model &model, unsigned int v, unsigned int c1);
 
 		long double colouringGammaCutoff() const;
 		long double boundingListGammaCutoff() const;
@@ -22,7 +22,7 @@ class Contract : public Update {
 		void updateColouring() override;
 		void updateBoundingChain() override;
 
-		unsigned int handle_c1(unsigned int v);
+		static unsigned int handle_c1(Model &model, unsigned int v);
 
 };
 

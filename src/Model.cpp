@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "Sampler.h"
 #include <algorithm>
 
 #define q 10
@@ -16,8 +17,8 @@ Model::Model(unsigned int n, const std::list<std::pair<unsigned, unsigned>>& edg
 }
 
 void Model::setColour(unsigned int v, unsigned int c) {
-    if (getBoundingList(v)[c]) {
-        setColour(v, c);
+    if ((not checkBoundingList) || getBoundingList(v)[c]) {
+        colouring[v] = c;
     } else {
         throw std::invalid_argument("New colour for vertex must be contained in bounding list.");
     }
@@ -126,4 +127,9 @@ boost::dynamic_bitset<> Model::bs_generateA(unsigned int v, unsigned int size) c
     }
 
     return A;
+}
+
+void Model::sample() {
+	Sampler sampler(*this);
+	sampler.sample();
 }

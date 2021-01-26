@@ -6,6 +6,7 @@ static bool checkParameters(unsigned q, unsigned Delta, long double B) {
 }
 
 int main(int argc, char **argv) {
+	// boost::program_options will handle command line parsing
 	namespace po = boost::program_options;
 
 	po::variables_map vm;
@@ -33,11 +34,12 @@ int main(int argc, char **argv) {
 	unsigned Delta = vm["delta"].as<unsigned int>();
 	long double B = vm["parameter"].as<long double>();
 
-
+//  check if parameters match conditions for theorem
+//  note that the algorithm still works if B is not in the correct interval, but there is no guaruntee
 	if (not checkParameters(q, Delta, B)) {
 		std::cout << "Parameters don't meet conditions of theorem.\n";
 		std::cout << "Try setting B in the interval (" << std::to_string(1 - (long double) (q - 2 * Delta) / Delta)
-		          << ")\n";
+		          << ", 1)\n";
 		return 0;
 	}
 

@@ -3,6 +3,9 @@
 //
 #include "Graph.h"
 
+/// constructor for the graph class
+/// \param n the number of vertices in the graph
+/// \param edges
 Graph::Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>> &edges) {
 	// Initialize matrix of size n x n
 	adjacencyMatrix = std::vector<std::vector<bool>>(n, std::vector<bool>(n));
@@ -14,6 +17,7 @@ Graph::Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>> &edges) 
 	}
 }
 
+/// return the number of edges in the graph
 unsigned Graph::getEdgeCount() const {
 	unsigned int total = 0;
 	for (std::vector<bool> neighbours : adjacencyMatrix) {

@@ -14,30 +14,47 @@
 //  - qComplement as method
 //  - Graph::getIndexVector moved
 
+
+/// \brief a class for holding parameters of the model, the colourings and the bounding chain
 class Model : public Graph {
 	private:
-		std::vector<unsigned> colouring;
-
 //      TODO: consider:
 //       - Model::Delta -> Graph::Delta
 //       - Model::B -> Sampler::B
-//      Parameters:
+
+		std::vector<unsigned> colouring;
+		std::vector<boost::dynamic_bitset<>> boundingChain;
 		unsigned int q;
 		unsigned int Delta;
 		long double B;
-
-
-		std::vector<boost::dynamic_bitset<>> boundingChain;
 		static std::mt19937 mersene_gen;
 		bool checkBoundingList = true;
 
-		static boost::dynamic_bitset<> atMostKUp(boost::dynamic_bitset<> bs, unsigned int k);
+		void atMostKUp(boost::dynamic_bitset<> &bs, unsigned int k) const;
 
 		boost::dynamic_bitset<> bs_getUnfixedColours(unsigned int v) const;
 
 		boost::dynamic_bitset<> bs_getFixedColours(unsigned int v) const;
 
 		boost::dynamic_bitset<> UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const;
+
+		unsigned int m(unsigned int v, unsigned int c) const;
+
+		unsigned int m_Q(unsigned int v, unsigned int c) const;
+
+		/// setter for the checkBoundingList property
+		void setBoundingListChecks(bool b) { checkBoundingList = b; }
+
+		/// setter for bounding list
+		void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
+
+		/// getter for the bounding list at vertex v
+		boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
+
+		/// getter for the bounding chain
+		std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
+
+		boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
 
 		friend class Update;
 
@@ -54,7 +71,13 @@ class Model : public Graph {
 		      long double B,
 		      const std::list<std::pair<unsigned int, unsigned int>> &edges);
 
-//      Constructor for default types
+/// constructor for some generic graphs
+/// \param type type of graph, may be one of {"cycle", "complete"}
+/// \param n the number of vertices in the graph
+/// \param q the number of colours
+/// \param Delta the maximum degree of the graph
+/// \param B the strength of the interactions between vertices
+/// \return a model object
 		static Model genericModelConstructor(const std::string &type,
 		                                     unsigned int n,
 		                                     unsigned int q,
@@ -89,21 +112,7 @@ class Model : public Graph {
 
 		std::vector<unsigned int> getNeighbourhoodColourCount(unsigned int v) const;
 
-		unsigned int m(unsigned int v, unsigned int c) const;
-
-		void setBoundingListChecks(bool b) { checkBoundingList = b; }
-
-		boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
-
 		std::vector<unsigned> getBoundingListIndex(unsigned int v) const { return getIndexVector(getBoundingList(v)); }
-
-		void setBoundingList(unsigned int v, const std::vector<unsigned int> &boundingList);
-
-		std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
-
-		unsigned int m_Q(unsigned int v, unsigned int c) const;
-
-		boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
 
 		void sample();
 };

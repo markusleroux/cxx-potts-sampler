@@ -12,30 +12,33 @@
 #include "Compress.h"
 #include "Contract.h"
 
+//		TODO: optimize to use pointers or avoid unnecessary copies
+
+/// \brief a class which holds the sampling algorithm
 class Sampler {
 	private:
 		Model &model;
 		unsigned int T;
-
-//		TODO: optimize to use pointers or avoid unnecessary copies
 		std::vector<std::vector<boost::variant<Compress, Contract>>> history;
 
 		std::vector<boost::variant<Compress, Contract>> iteration();
 
 		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract>> &seeds);
 
+///		write the lists of seeds to the history in place
 		void writeHistory(const std::vector<boost::variant<Compress, Contract>> &seeds) { history.emplace_back(seeds); }
 
 		bool boundingChainIsConstant() const;
 
-//		static function for use in constructor
 		static unsigned int generateT(const Model &m);
 
 		unsigned int generateT() { return generateT(model); }
 
 	public:
+		/// constructor for the sampler class which chooses the number of iterations of phase two automatically
 		explicit Sampler(Model &model) : Sampler(model, generateT(model)) {};
 
+		/// constructor for the sampler class which accepts the number of iterations of phase two as a parameter
 		Sampler(Model &model, unsigned int T) : model(model), T(T) {};
 
 		void sample();

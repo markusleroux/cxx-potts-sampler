@@ -7,13 +7,11 @@
 
 #include "Update.h"
 
+/// \brief a class for holding contract type updates; used by Sampler class
 class Contract : public Update {
 	private:
 		unsigned int unfixedCount;
 		unsigned int c2;
-
-	public:
-		Contract(Model &model, unsigned int v);
 
 		Contract(Model &model, unsigned int v, unsigned int c1);
 
@@ -21,11 +19,14 @@ class Contract : public Update {
 
 		long double boundingListGammaCutoff() const;
 
+		static unsigned int handle_c1(Model &model, unsigned int v);
+
+	public:
+		Contract(Model &model, unsigned int v);
+
 		void updateColouring() override;
 
 		void updateBoundingChain() override;
-
-		static unsigned int handle_c1(Model &model, unsigned int v);
 
 };
 

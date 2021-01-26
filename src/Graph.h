@@ -16,6 +16,7 @@ class Graph {
 		std::vector<std::vector<bool>> adjacencyMatrix;
 
 	protected:
+		/// getter for column v of the adjacency matrix
 		std::vector<bool> getNeighboursBool(unsigned v) const { return adjacencyMatrix[v]; }
 
 		/// template which returns the indices of the set bits
@@ -34,6 +35,7 @@ class Graph {
 	public:
 		Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>> &edges);
 
+		/// get the number of vertices in the graph
 		unsigned getSize() const { return adjacencyMatrix.size(); }
 
 		unsigned getEdgeCount() const;
@@ -42,14 +44,17 @@ class Graph {
 		std::vector<unsigned int> getNeighboursIndex(unsigned v) const {
 			return getIndexVector<std::vector<bool>>(getNeighboursBool((v)));
 		}
-
-		std::vector<std::vector<bool>> getAdjacencyMatrix() const { return adjacencyMatrix; }
 };
 
 /// Overload << to print vector contents
-template<typename T>
-static std::ostream &operator<<(std::ostream &out, const std::vector<T> &vector) {
-	for (unsigned value : vector) { out << value << ","; }
+template<typename element_type>
+static std::ostream &operator<<(std::ostream &out, const std::vector<element_type> &vector) {
+	if (not vector.empty()) {
+		for (auto it = std::begin(vector); it != std::prev(std::end(vector)); it++) {
+			out << *it << ",";
+		}
+		out << *std::prev(std::end(vector));
+	}
 	return out;
 }
 

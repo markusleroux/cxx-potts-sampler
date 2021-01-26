@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	// Declare arguments
 	description.add_options()
 			("help,h", "Display this help message")
-			("parameter,B", po::value<long double>()->default_value((long double) 0.5), "Parameter B")
+			("parameter,B", po::value<long double>()->default_value((long double) 0.5), "Parameter B controls the strenth of interactions; must be in the interval (0, 1)")
 			("colours,q", po::value<unsigned int>()->required(), "Number of colours")
 			("delta,d", po::value<unsigned int>()->required(), "Maximum degree of graph")
 			("number,n", po::value<unsigned int>()->required(), "Number of vertices")
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	long double B = vm["parameter"].as<long double>();
 
 //  check if parameters match conditions for theorem
-//  note that the algorithm still works if B is not in the correct interval, but there is no guaruntee
+//  note that the algorithm still works if B is not in the correct interval, but there is no guarantee
 	if (not checkParameters(q, Delta, B)) {
 		std::cout << "Parameters don't meet conditions of theorem.\n";
 		std::cout << "Try setting B in the interval (" << std::to_string(1 - (long double) (q - 2 * Delta) / Delta)

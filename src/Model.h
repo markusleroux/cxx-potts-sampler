@@ -71,39 +71,18 @@ class Model : public Graph {
 		      long double B,
 		      const std::list<std::pair<unsigned int, unsigned int>> &edges);
 
-/// constructor for some generic graphs
-/// \param type type of graph, may be one of {"cycle", "complete"}
-/// \param n the number of vertices in the graph
-/// \param q the number of colours
-/// \param Delta the maximum degree of the graph
-/// \param B the strength of the interactions between vertices
-/// \return a model object
 		static Model genericModelConstructor(const std::string &type,
 		                                     unsigned int n,
 		                                     unsigned int q,
 		                                     unsigned int Delta,
-		                                     long double B) {
-			std::list<std::pair<unsigned, unsigned>> edges;
-			if (type == "cycle") {
-				for (int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
-				if (n > 2) { edges.emplace_back(n - 1, 0); }
-			} else if (type == "complete") {
-				for (int i = 0; i < n; i++) {
-					for (int j = 0; j < n; j++) {
-						if (j != i) { edges.emplace_back(i, j); }
-					}
-				}
-			} else {
-				throw std::invalid_argument("Invalid graph type.");
-			}
+		                                     long double B);
 
-			return Model(n, q, Delta, B, edges);
-		}
-
+		/// get the colour of a specific vertex
 		int getColour(unsigned int v) const { return colouring[v]; }
 
 		void setColour(unsigned int v, unsigned int c);
 
+		/// get the current colouring of the graph
 		std::vector<unsigned int> getColouring() { return colouring; }
 
 		std::vector<unsigned int> getUnfixedColours(unsigned int v) const;

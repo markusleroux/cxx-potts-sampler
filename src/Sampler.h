@@ -12,7 +12,7 @@
 #include "Compress.h"
 #include "Contract.h"
 
-//		TODO: optimize to use pointers or avoid unnecessary copies
+//	TODO: optimize to use pointers or avoid unnecessary copies
 
 /// \brief a class which holds the sampling algorithm
 class Sampler {
@@ -25,13 +25,13 @@ class Sampler {
 
 		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract>> &seeds);
 
-///		write the lists of seeds to the history in place
+///		write the lists of seeds to the history (in place)
 		void writeHistory(const std::vector<boost::variant<Compress, Contract>> &seeds) { history.emplace_back(seeds); }
 
 		bool boundingChainIsConstant() const;
 
 		static unsigned int generateT(const Model &m);
-
+		/// non-static wrapper for generateT
 		unsigned int generateT() { return generateT(model); }
 
 	public:

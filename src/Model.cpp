@@ -23,6 +23,35 @@ Model::Model(unsigned int n,
 	boundingChain = std::vector<boost::dynamic_bitset<> >(n, ~boost::dynamic_bitset<>(q));
 }
 
+/// constructor for some generic graphs
+/// \param type type of graph, may be one of {"cycle", "complete"}
+/// \param n the number of vertices in the graph
+/// \param q the number of colours
+/// \param Delta the maximum degree of the graph
+/// \param B the strength of the interactions between vertices
+/// \return a model object
+Model Model::genericModelConstructor(const std::string &type,
+                                     unsigned int n,
+                                     unsigned int q,
+                                     unsigned int Delta,
+                                     long double B) {
+	std::list<std::pair<unsigned, unsigned>> edges;
+	if (type == "cycle") {
+		for (int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
+		if (n > 2) { edges.emplace_back(n - 1, 0); }
+	} else if (type == "complete") {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (j != i) { edges.emplace_back(i, j); }
+			}
+		}
+	} else {
+		throw std::invalid_argument("Invalid graph type.");
+	}
+
+	return Model(n, q, Delta, B, edges);
+}
+
 /// A setter for vertex colour which respects bounding lists when checkBoundingList == true
 /// \param v the vertex to update
 /// \param c the new colour for v

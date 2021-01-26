@@ -30,11 +30,11 @@ class Update {
 		static unsigned int bs_uniformSample(const boost::dynamic_bitset<> &bs);
 
 		/// template for sampling from the distribution described by weights
-		/// \tparam T the type of the elements of weights
+		/// \tparam weight_type the type of the elements of weights
 		/// \param weights a vector of weights, such that the probability the function returns i is proportional to w_i
 		/// \return a sample from the distribution described by weights
-		template<typename T>
-		static unsigned int sampleFromDist(const std::vector<T> &weights) {
+		template<typename weight_type>
+		static unsigned int sampleFromDist(const std::vector<weight_type> &weights) {
 			std::discrete_distribution<unsigned int> dist(weights.begin(), weights.end());
 			return dist(Model::mersene_gen);
 		}

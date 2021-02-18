@@ -17,7 +17,7 @@ The build process has been tested on OSX, but should work on any *nix system.
 Once built, information about the command line options is available under the --help (-h) flag. At the moment, specification of the graph structure from the
 command line only supports a small number of types of graph. Two flags are used to specify the structure of the graph:
 * --number (-n): the number of vertices in the graph
-* --type (-t): the type of the graph (currently, only `cycle and `complete graph families are supported)
+* --type (-t): the type of the graph (currently, only `cycle` and `complete` graph families are supported)
 
 The parameters of th model may be controlled similarly. The following parameters are available:
 * --parameter (-B): the parameter of the model (defaults to 0.5)

@@ -24,7 +24,7 @@ The parameters of th model may be controlled similarly. The following parameters
 * --colours (-q): the number of colours to use
 * --delta (-d): the maximum degree of any of the graphs in the family you wish to sample from
 
-For example, with the sampler executable on the path, a sample from the model with 5 colours and parameters B = 0.95, \Delta = 3 on the cyclic graph with 5
+For example, with the sampler executable on the path, a sample from the model with 5 colours and parameters B = 0.95, Delta = 3 on the cyclic graph with 5
 vertices can be generated as follows:
 ```shell
 sampler -B 0.95 -q 5 -d 3 -n 5 -t cycle

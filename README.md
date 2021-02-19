@@ -6,7 +6,7 @@ A perfect sampling algorithm for the anti-ferromagnetic Potts model. The expecte
 Download and build the source code from the repository:
 ```shell
 git clone https://github.com/markusleroux/cxx-potts-sampler.git
-cd cxx-potts-sampler/bin
+cd cxx-potts-sampler/build
 cmake ..
 cmake --build
 ```

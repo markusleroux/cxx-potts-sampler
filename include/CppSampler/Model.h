@@ -23,7 +23,7 @@ class Model : public Graph {
 //       - Model::B -> Sampler::B
 
 		std::vector<unsigned> colouring;
-		std::vector<boost::dynamic_bitset<>> boundingChain;
+		std::vector<boost::dynamic_bitset<> > boundingChain;
 		unsigned int q;
 		unsigned int Delta;
 		long double B;
@@ -52,7 +52,7 @@ class Model : public Graph {
 		boost::dynamic_bitset<> getBoundingList(unsigned int v) const { return boundingChain[v]; }
 
 		/// getter for the bounding chain
-		std::vector<boost::dynamic_bitset<>> getBoundingChain() const { return boundingChain; }
+		std::vector<boost::dynamic_bitset<> > getBoundingChain() const { return boundingChain; }
 
 		boost::dynamic_bitset<> bs_generateA(unsigned int v, unsigned int size) const;
 
@@ -69,7 +69,7 @@ class Model : public Graph {
 		      unsigned int q,
 		      unsigned int Delta,
 		      long double B,
-		      const std::list<std::pair<unsigned int, unsigned int>> &edges);
+		      const std::list<std::pair<unsigned int, unsigned int> > &edges);
 
 		static Model genericModelConstructor(const std::string &type,
 		                                     unsigned int n,

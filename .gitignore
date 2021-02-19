@@ -1,7 +1,9 @@
-# Ignore the build and lib dirs
-build
+# Ignore the build directory and other stuff
+/build*
 .vscode
-# lib/*
+.ccls-cache
+.idea
+compile_commands.json
 
 # Ignore any executables
 bin/*

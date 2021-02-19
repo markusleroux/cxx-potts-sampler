@@ -28,8 +28,8 @@ void Sampler::updateColourWithSeeds(std::vector<boost::variant<Compress, Contrac
 }
 
 /// apply a single iteration of the algorithm
-std::vector<boost::variant<Compress, Contract>> Sampler::iteration() {
-	std::vector<boost::variant<Compress, Contract>> seeds;
+std::vector<boost::variant<Compress, Contract> > Sampler::iteration() {
+	std::vector<boost::variant<Compress, Contract> > seeds;
 
 //	Phase One
 	boost::dynamic_bitset<> A;
@@ -49,7 +49,7 @@ std::vector<boost::variant<Compress, Contract>> Sampler::iteration() {
 
 //	Phase Two
 	unsigned int v;
-	for (int i = 0; i < T; i++) {
+	for (unsigned int i = 0; i < T; i++) {
 		// choose v uniformly at random
 		v = Update::bs_uniformSample(~boost::dynamic_bitset<>(model.getSize()));
 		seeds.emplace_back(Contract(model, v));
@@ -79,7 +79,7 @@ unsigned int Sampler::generateT(const Model &m) {
 
 /// predicate which holds if the bounding lists have size one at every vertex of the graph
 bool Sampler::boundingChainIsConstant() const {
-	std::vector<boost::dynamic_bitset<>> boundingChain = model.getBoundingChain();
+	std::vector<boost::dynamic_bitset<> > boundingChain = model.getBoundingChain();
 	return std::all_of(boundingChain.begin(), boundingChain.end(),
 	                   [](const boost::dynamic_bitset<> &bs) { return bs.count() == 1; });
 }

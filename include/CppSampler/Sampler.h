@@ -19,14 +19,14 @@ class Sampler {
 	private:
 		Model &model;
 		unsigned int T;
-		std::vector<std::vector<boost::variant<Compress, Contract>>> history;
+		std::vector<std::vector<boost::variant<Compress, Contract> > >  history;
 
-		std::vector<boost::variant<Compress, Contract>> iteration();
+		std::vector<boost::variant<Compress, Contract> > iteration();
 
-		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract>> &seeds);
+		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract> > &seeds);
 
 ///		write the lists of seeds to the history (in place)
-		void writeHistory(const std::vector<boost::variant<Compress, Contract>> &seeds) { history.emplace_back(seeds); }
+		void writeHistory(const std::vector<boost::variant<Compress, Contract> > &seeds) { history.emplace_back(seeds); }
 
 		bool boundingChainIsConstant() const;
 

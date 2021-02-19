@@ -13,7 +13,7 @@
 /// \brief A class for graphs as adjacency matrices
 class Graph {
 	private:
-		std::vector<std::vector<bool>> adjacencyMatrix;
+		std::vector<std::vector<bool> > adjacencyMatrix;
 
 	protected:
 		/// getter for column v of the adjacency matrix
@@ -33,7 +33,7 @@ class Graph {
 		}
 
 	public:
-		Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>> &edges);
+		Graph(unsigned n, const std::list<std::pair<unsigned, unsigned> > &edges);
 
 		/// get the number of vertices in the graph
 		unsigned getSize() const { return adjacencyMatrix.size(); }
@@ -42,7 +42,7 @@ class Graph {
 
 		/// a method which gets the indices of the neighbours of v
 		std::vector<unsigned int> getNeighboursIndex(unsigned v) const {
-			return getIndexVector<std::vector<bool>>(getNeighboursBool((v)));
+			return getIndexVector<std::vector<bool> >(getNeighboursBool((v)));
 		}
 };
 

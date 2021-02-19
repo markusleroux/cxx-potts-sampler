@@ -43,6 +43,7 @@ unsigned int Compress::sampleFromA() const {
 		if (A[i]) { Z += weights[i]; }
 	}
 
+
 	long double tau_x_Denominator = tau * Z;
 	long double total = 0;
 	for (unsigned int c : Model::getIndexVector<boost::dynamic_bitset<>>(A)) {

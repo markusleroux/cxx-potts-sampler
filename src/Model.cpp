@@ -15,7 +15,7 @@ Model::Model(unsigned int n,
              unsigned int q,
              unsigned int Delta,
              long double B,
-             const std::list<std::pair<unsigned, unsigned>> &edges) : Graph(n, edges), q(q), Delta(Delta), B(B) {
+             const std::list<std::pair<unsigned, unsigned> > &edges) : Graph(n, edges), q(q), Delta(Delta), B(B) {
 	// Initialize vector of colours
 	colouring = std::vector<unsigned int>(n);
 
@@ -35,13 +35,13 @@ Model Model::genericModelConstructor(const std::string &type,
                                      unsigned int q,
                                      unsigned int Delta,
                                      long double B) {
-	std::list<std::pair<unsigned, unsigned>> edges;
+	std::list<std::pair<unsigned, unsigned> > edges;
 	if (type == "cycle") {
-		for (int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
+		for (unsigned int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
 		if (n > 2) { edges.emplace_back(n - 1, 0); }
 	} else if (type == "complete") {
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
+		for (unsigned int i = 0; i < n; i++) {
+			for (unsigned int j = 0; j < n; j++) {
 				if (j != i) { edges.emplace_back(i, j); }
 			}
 		}

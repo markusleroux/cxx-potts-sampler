@@ -35,6 +35,8 @@ class Graph {
 	public:
 		Graph(unsigned n, const std::list<std::pair<unsigned, unsigned> > &edges);
 
+		Graph(unsigned int n, const std::string &type);
+
 		/// get the number of vertices in the graph
 		unsigned getSize() const { return adjacencyMatrix.size(); }
 
@@ -44,6 +46,8 @@ class Graph {
 		std::vector<unsigned int> getNeighboursIndex(unsigned v) const {
 			return getIndexVector<std::vector<bool> >(getNeighboursBool((v)));
 		}
+
+		static std::list<std::pair<unsigned int, unsigned int>> buildEdgeSet(unsigned int n, const std::string &type);
 };
 
 /// Overload << to print vector contents

@@ -50,8 +50,7 @@ int main(int argc, char **argv) {
   }
 
   try {
-    Model m = Model::genericModelConstructor(vm["type"].as<std::string>(), n, q,
-                                             Delta, B);
+    Model m(n, q, Delta, B, vm["type"].as<std::string>());
     m.sample();
     std::cout << m;
   } catch (std::exception &e) {

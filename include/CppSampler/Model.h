@@ -71,11 +71,11 @@ class Model : public Graph {
 		      long double B,
 		      const std::list<std::pair<unsigned int, unsigned int> > &edges);
 
-		static Model genericModelConstructor(const std::string &type,
-		                                     unsigned int n,
-		                                     unsigned int q,
-		                                     unsigned int Delta,
-		                                     long double B);
+		Model(unsigned int n,
+		      unsigned int q,
+		      unsigned int Delta,
+		      long double B,
+		      const std::string &type);
 
 		/// get the colour of a specific vertex
 		int getColour(unsigned int v) const { return colouring[v]; }

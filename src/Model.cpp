@@ -30,26 +30,16 @@ Model::Model(unsigned int n,
 /// \param Delta the maximum degree of the graph
 /// \param B the strength of the interactions between vertices
 /// \return a model object
-Model Model::genericModelConstructor(const std::string &type,
-                                     unsigned int n,
-                                     unsigned int q,
-                                     unsigned int Delta,
-                                     long double B) {
-	std::list<std::pair<unsigned, unsigned> > edges;
-	if (type == "cycle") {
-		for (unsigned int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
-		if (n > 2) { edges.emplace_back(n - 1, 0); }
-	} else if (type == "complete") {
-		for (unsigned int i = 0; i < n; i++) {
-			for (unsigned int j = 0; j < n; j++) {
-				if (j != i) { edges.emplace_back(i, j); }
-			}
-		}
-	} else {
-		throw std::invalid_argument("Invalid graph type.");
-	}
+Model::Model(unsigned int n,
+             unsigned int q,
+             unsigned int Delta,
+             long double B,
+             const std::string &type) : Graph(n, type), q(q), Delta(Delta), B(B) {
+	// Initialize vector of colours
+	colouring = std::vector<unsigned int>(n);
 
-	return Model(n, q, Delta, B, edges);
+	// Initialize bounding chain
+	boundingChain = std::vector<boost::dynamic_bitset<> >(n, ~boost::dynamic_bitset<>(q));
 }
 
 /// A setter for vertex colour which respects bounding lists when checkBoundingList == true

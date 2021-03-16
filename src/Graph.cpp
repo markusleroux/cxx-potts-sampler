@@ -6,32 +6,39 @@
 /// constructor for the graph class
 /// \param n the number of vertices in the graph
 /// \param edges
-Graph::Graph(unsigned n, const std::list<std::pair<unsigned, unsigned>> &edges) {
-	// Initialize matrix of size n x n
-	adjacencyMatrix = std::vector<std::vector<bool>>(n, std::vector<bool>(n));
+Graph::Graph(unsigned n, const std::list<edge_t> &edges) {
+  // Initialize matrix of size n x n
+  adjacencyMatrix = adjmatrix_t(n, std::vector<bool>(n));
 
-	// Populate adjacencyMatrix with edges
-	for (std::pair<unsigned, unsigned> edge : edges) {
-		adjacencyMatrix[edge.first][edge.second] = true;
-		adjacencyMatrix[edge.second][edge.first] = true;
-	}
+  // Populate adjacencyMatrix with edges
+  for (edge_t edge : edges) {
+    adjacencyMatrix[edge.first][edge.second] = true;
+    adjacencyMatrix[edge.second][edge.first] = true;
+  }
 }
 
-Graph::Graph(unsigned n, const std::string &type) : Graph(n, buildEdgeSet(n, type)) {}
-
+Graph::Graph(unsigned n, const std::string &type)
+    : Graph(n, buildEdgeSet(n, type)) {}
 
 /// helper function for constructing a set of edges
 /// \param n the number of vertices in the graph
 /// \param type the type of the graph (one of cycle, complete)
-std::list<std::pair<unsigned, unsigned>> Graph::buildEdgeSet(unsigned n, const std::string &type) {
-	std::list<std::pair<unsigned, unsigned> > edges;
+std::list<edge_t> Graph::buildEdgeSet(unsigned n, const std::string &type) {
+	std::list<edge_t> edges;
 	if (type == "cycle") {
-		for (unsigned int i = 0; i + 1 < n; i++) { edges.emplace_back(i, i + 1); }
-		if (n > 2) { edges.emplace_back(n - 1, 0); }
+		for (int i = 0; i + 1 < n; i++) {
+			edges.emplace_back(i, i + 1);
+		}
+		if (n > 2) {
+			edges.emplace_back(n - 1, 0);
+		}
 	} else if (type == "complete") {
-		for (unsigned int i = 0; i < n; i++) {
-			for (unsigned int j = 0; j < n; j++) {
-				if (j != i) { edges.emplace_back(i, j); }
+		int j;
+		for (int i = 0; i < n; i++) {
+			for (j = 0; j < n; j++) {
+				if (i != j) {
+					edges.emplace_back(i, j);
+				}
 			}
 		}
 	} else {
@@ -42,9 +49,9 @@ std::list<std::pair<unsigned, unsigned>> Graph::buildEdgeSet(unsigned n, const s
 
 /// return the number of edges in the graph
 unsigned Graph::getEdgeCount() const {
-	unsigned int total = 0;
-	for (std::vector<bool> neighbours : adjacencyMatrix) {
-		total += std::count(neighbours.begin(), neighbours.end(), true);
-	}
-	return total / 2;
+  unsigned total{0};
+  for (std::vector<bool> neighbours : adjacencyMatrix) {
+    total += std::count(neighbours.begin(), neighbours.end(), true);
+  }
+  return total / 2;
 }

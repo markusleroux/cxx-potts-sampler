@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   // Declare arguments
   description.add_options()("help,h", "Display this help message")(
       "parameter,B", po::value<long double>()->default_value((long double)0.5),
-      "Parameter B controls the strenth of interactions; must be in the "
+      "Parameter B controls the strength of interactions; must be in the "
       "interval (0, 1)")("colours,q", po::value<unsigned int>()->required(),
                          "Number of colours")(
       "delta,d", po::value<unsigned int>()->required(),

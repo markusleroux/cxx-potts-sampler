@@ -8,7 +8,7 @@ Download and build the source code from the repository:
 git clone https://github.com/markusleroux/cxx-potts-sampler.git
 cd cxx-potts-sampler/build
 cmake ..
-cmake --build
+cmake --build .
 ```
 The build process has been tested on OSX, but should work on any *nix system.
 
@@ -27,5 +27,5 @@ The parameters of th model may be controlled similarly. The following parameters
 For example, with the sampler executable on the path, a sample from the model with 5 colours and parameters B = 0.95, Delta = 3 on the cyclic graph with 5
 vertices can be generated as follows:
 ```shell
-sampler -B 0.95 -q 5 -d 3 -n 5 -t cycle
+sampler -B 0.95 -q 7 -d 3 -n 10 -t cycle
 ```

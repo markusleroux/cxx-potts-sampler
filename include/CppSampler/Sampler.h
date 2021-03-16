@@ -5,44 +5,46 @@
 #ifndef POTTSSAMPLER_SAMPLER_H
 #define POTTSSAMPLER_SAMPLER_H
 
-
-#include <boost/variant.hpp>
-#include "Model.h"
-#include "Update.h"
 #include "Compress.h"
 #include "Contract.h"
+#include "Model.h"
+#include "Update.h"
+#include <boost/variant.hpp>
 
 //	TODO: optimize to use pointers or avoid unnecessary copies
 
+typedef std::vector<boost::variant<Compress, Contract>> iteration_t;
+
 /// \brief a class which holds the sampling algorithm
 class Sampler {
-	private:
-		Model &model;
-		unsigned int T;
-		std::vector<std::vector<boost::variant<Compress, Contract> > >  history;
+private:
+  Model &model;
+  unsigned int T;
+  std::vector<iteration_t> history;
 
-		std::vector<boost::variant<Compress, Contract> > iteration();
+  iteration_t iteration();
 
-		void updateColourWithSeeds(std::vector<boost::variant<Compress, Contract> > &seeds);
+  static void updateColourWithSeeds(iteration_t &seeds);
 
-///		write the lists of seeds to the history (in place)
-		void writeHistory(const std::vector<boost::variant<Compress, Contract> > &seeds) { history.emplace_back(seeds); }
+  ///		write the lists of seeds to the history (in place)
+  void writeHistory(const iteration_t &seeds) { history.emplace_back(seeds); }
 
-		bool boundingChainIsConstant() const;
+  bool boundingChainIsConstant() const;
 
-		static unsigned int generateT(const Model &m);
-		/// non-static wrapper for generateT
-		unsigned int generateT() { return generateT(model); }
+  static unsigned int generateT(const Model &m);
+  /// non-static wrapper for generateT
+  unsigned int generateT() { return generateT(model); }
 
-	public:
-		/// constructor for the sampler class which chooses the number of iterations of phase two automatically
-		explicit Sampler(Model &model) : Sampler(model, generateT(model)) {};
+public:
+  /// constructor for the sampler class which chooses the number of iterations
+  /// of phase two automatically
+  explicit Sampler(Model &model) : Sampler(model, generateT(model)){};
 
-		/// constructor for the sampler class which accepts the number of iterations of phase two as a parameter
-		Sampler(Model &model, unsigned int T) : model(model), T(T) {};
+  /// constructor for the sampler class which accepts the number of iterations
+  /// of phase two as a parameter
+  Sampler(Model &model, unsigned int T) : model(model), T(T){};
 
-		void sample();
+  void sample();
 };
 
-
-#endif //POTTSSAMPLER_SAMPLER_H
+#endif // POTTSSAMPLER_SAMPLER_H

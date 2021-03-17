@@ -9,7 +9,7 @@
 #include "Update.h"
 #include <boost/variant.hpp>
 
-//	TODO: optimize to use pointers or avoid unnecessary copies
+//	TODO: optimize to avoid unnecessary copies
 
 typedef std::vector<boost::variant<Compress, Contract>> iteration_t;
 
@@ -17,21 +17,23 @@ typedef std::vector<boost::variant<Compress, Contract>> iteration_t;
 class Sampler {
 private:
   Model &model;
-  unsigned int T;
+  int T;
   std::vector<iteration_t> history;
 
   iteration_t iteration();
 
-  static void updateColourWithSeeds(iteration_t &seeds);
+  void updateColourWithSeeds(iteration_t &seeds);
 
   ///		write the lists of seeds to the history (in place)
   void writeHistory(const iteration_t &seeds) { history.emplace_back(seeds); }
 
   bool boundingChainIsConstant() const;
 
-  static unsigned int generateT(const Model &m);
+  static int generateT(const Model &m);
   /// non-static wrapper for generateT
-  unsigned int generateT() { return generateT(model); }
+  int generateT() { return generateT(model); }
+
+  friend class SamplerTest;
 
 public:
   /// constructor for the sampler class which chooses the number of iterations
@@ -40,7 +42,7 @@ public:
 
   /// constructor for the sampler class which accepts the number of iterations
   /// of phase two as a parameter
-  Sampler(Model &model, unsigned int T) : model(model), T(T){};
+  Sampler(Model &model, int T) : model(model), T(T){};
 
   void sample();
 };

@@ -19,9 +19,6 @@ FATAL: In-source builds are not allowed.
 ")
 endif()
 
-find_package(Boost 1.40 COMPONENTS program_options REQUIRED)
-
+include_directories(include/CppSampler)
 add_subdirectory(src)
-target_include_directories(sampler PUBLIC include/CppSampler)
-target_compile_features(sampler PUBLIC cxx_std_17)
-set_target_properties(sampler PROPERTIES CXX_EXTENSIONS OFF)
+add_subdirectory(tests)

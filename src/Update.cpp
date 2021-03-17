@@ -3,8 +3,6 @@
 //
 
 #include "Update.h"
-#include "Model.h"
-#include <random>
 
 /// a method for sampling from the uniform distribution on the interval [0, 1]
 long double Update::unitDist() {
@@ -14,15 +12,15 @@ long double Update::unitDist() {
 
 /// a method for sampling from the uniform distribution over the set bits of a
 /// bitset
-unsigned int Update::bs_uniformSample(const BoundingList &bs) {
-  std::vector<unsigned int> weights(bs.size(), 0);
+int Update::bs_uniformSample(const BoundingList &bs) {
+  std::vector<int> weights(bs.size(), 0);
   for (int i = 0; i < bs.size(); i++) {
     if (bs[i]) {
       weights[i] = 1;
     }
   }
 
-  return sampleFromDist<unsigned int>(weights);
+  return sampleFromDist<int>(weights);
 }
 
 /// a method which applies the map c -> B^c to a vector
@@ -30,32 +28,31 @@ unsigned int Update::bs_uniformSample(const BoundingList &bs) {
 /// \param counts a vector containing the exponent
 /// \return a vector of weights B^c
 std::vector<long double>
-Update::computeWeights(long double B, std::vector<unsigned int> counts) {
+Update::computeWeights(long double B, std::vector<int> counts) {
   std::vector<long double> weights(counts.size());
   std::transform(counts.begin(), counts.end(), weights.begin(),
-                 [B](unsigned int m_c) { return pow(B, m_c); });
+                 [B](int m_c) { return pow(B, m_c); });
   return weights;
 }
 
 /// constructor for Contract update which chooses c1
 /// \param model the model to update
 /// \param v the vertex to update
-Contract::Contract(Model &model, unsigned int v)
+Contract::Contract(Model &model, int v)
     : Contract(model, v, handle_c1(model, v)) {}
 
 /// constructor for Contract update which accepts c1
 /// \param m the model to update
 /// \param v the vertex to update
 /// \param c1 the proposal for the new colour of v
-Contract::Contract(Model &m, unsigned int v, unsigned int c1)
+Contract::Contract(Model &m, int v, int c1)
     : Update(m, v, c1) {
-  unfixedCount = model.bs_getUnfixedColours(v).count();
+  unfixedCount = static_cast<int>(model.bs_getUnfixedColours(v).count());
 
-  std::vector<long double> weights(model.q);
+  std::vector<long double> weights(static_cast<unsigned long>(model.q));
 
-  //	TODO: see similarity with Update::computeWeights
-  for (unsigned c : model.getFixedColours(v)) {
-    weights[c] = (long double)pow(model.B, model.m_Q(v, c));
+  for (int c : model.getFixedColours(v)) {
+    weights[c] = pow(model.B, model.m_Q(v, c));
   }
 
   c2 = sampleFromDist<long double>(weights);
@@ -66,7 +63,7 @@ Contract::Contract(Model &m, unsigned int v, unsigned int c1)
 /// \param v the vertex to update
 /// \return a new colour sampled uniformly from the set of unfixed colours at v
 /// \sa Model::bs_getUnfixedColours
-unsigned int Contract::handle_c1(Model &m, unsigned int v) {
+int Contract::handle_c1(Model &m, int v) {
   return bs_uniformSample(m.bs_getUnfixedColours(v));
 }
 
@@ -76,7 +73,7 @@ long double Contract::colouringGammaCutoff() const {
       computeWeights(model.B, model.getNeighbourhoodColourCount(v));
   long double Z =
       std::accumulate(weights.begin(), weights.end(), (long double)0.0);
-  return ((long double)pow(model.B, weights[c1])) * (long double)unfixedCount /
+  return (pow(model.B, weights[c1])) * (long double)unfixedCount /
          Z;
 }
 
@@ -119,7 +116,7 @@ void Contract::updateBoundingChain() {
 /// \param v the vertex to update
 /// \param bs_A the set A, common to all the compress updates in a neighbourhood
 /// \sa Model::bs_generateA
-Compress::Compress(Model &model, unsigned int v, const BoundingList &bs_A)
+Compress::Compress(Model &model, int v, const BoundingList &bs_A)
     : Compress(model, v, bs_uniformSample(bs_A.C()), bs_A) {}
 
 /// constructor for initializing a compress update which accepts c1
@@ -127,7 +124,7 @@ Compress::Compress(Model &model, unsigned int v, const BoundingList &bs_A)
 /// \param v the vertex to update
 /// \param bs_A the set A, common to all the compress updates in a neighbourhood
 /// \sa Model::bs_generateA
-Compress::Compress(Model &model, unsigned int v, unsigned int c1,
+Compress::Compress(Model &model, int v, int c1,
                    const BoundingList &bs_A)
     : Update(model, v, c1), A(bs_A){}
 
@@ -142,7 +139,7 @@ long double Compress::gammaCutoff() const {
 }
 
 /// generate a sample from the set A
-unsigned int Compress::sampleFromA() const {
+int Compress::sampleFromA() const {
   std::vector<long double> weights =
       computeWeights(model.B, model.getNeighbourhoodColourCount(v));
 
@@ -157,7 +154,7 @@ unsigned int Compress::sampleFromA() const {
 
   long double tau_x_Denominator = tau * Z;
   long double total = 0;
-  for (unsigned int c : Graph::getIndexVector<BoundingList>(A)) {
+  for (int c : getIndexVector<BoundingList>(A)) {
     if (total + weights[c] > tau_x_Denominator) {
       return c;
     } else {
@@ -190,7 +187,7 @@ void Compress::updateColouring() {
 /// update the bounding list using the seed
 void Compress::updateBoundingChain() {
   BoundingList bs(model.q);
-  bs.set(c1);
+  bs.set((unsigned long) c1);
   bs |= A;
 
   model.boundingChain[v] = bs;

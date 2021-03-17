@@ -13,14 +13,14 @@
 class Update {
 protected:
   Model &model;
-  const unsigned v;
-  const unsigned c1;
+  const int v;
+  const int c1;
   const long double gamma = unitDist();
 
-  explicit Update(Model &m, unsigned v, unsigned c1) : v(v), c1(c1), model(m) {}
+  explicit Update(Model &m, int v, int c1) : v(v), c1(c1), model(m) {}
 
   static std::vector<long double> computeWeights(long double B,
-                                                 std::vector<unsigned> counts);
+                                                 std::vector<int> counts);
 
   virtual void updateColouring() = 0;
 
@@ -28,7 +28,7 @@ protected:
 
   static long double unitDist();
 
-  static unsigned int bs_uniformSample(const BoundingList &bs);
+  static int bs_uniformSample(const BoundingList &bs);
 
   /// template for sampling from the distribution described by weights
   /// \tparam weight_type the type of the elements of weights
@@ -36,13 +36,15 @@ protected:
   /// returns i is proportional to w_i \return a sample from the distribution
   /// described by weights
   template <typename weight_type>
-  static unsigned int sampleFromDist(const std::vector<weight_type> &weights) {
-    std::discrete_distribution<unsigned int> dist(weights.begin(),
+  static int sampleFromDist(const std::vector<weight_type> &weights) {
+    std::discrete_distribution<int> dist(weights.begin(),
                                                   weights.end());
     return dist(Model::mersene_gen);
   }
 
   friend class Sampler;
+
+  friend class UpdateTest;
 
 public:
   /// update the bounding chain, then update the colouring
@@ -62,19 +64,21 @@ public:
 /// \brief a class for holding contract type updates; used by Sampler class
 class Contract : public Update {
 private:
-  unsigned int unfixedCount;
-  unsigned int c2;
+  int unfixedCount;
+  int c2;
 
-  Contract(Model &model, unsigned int v, unsigned int c1);
+  Contract(Model &model, int v, int c1);
 
   long double colouringGammaCutoff() const;
 
   long double boundingListGammaCutoff() const;
 
-  static unsigned int handle_c1(Model &model, unsigned int v);
+  static int handle_c1(Model &model, int v);
+
+  friend class ContractTest;
 
 public:
-  Contract(Model &model, unsigned int v);
+  Contract(Model &model, int v);
 
   void updateColouring() override;
 
@@ -87,15 +91,17 @@ private:
   const long double tau = unitDist();
   const BoundingList A;
 
-  Compress(Model &model, unsigned int v, unsigned int c1,
+  Compress(Model &model, int v, int c1,
            const BoundingList &bs_A);
 
   long double gammaCutoff() const;
 
-  unsigned int sampleFromA() const;
+  int sampleFromA() const;
+
+  friend class CompressTest;
 
 public:
-  Compress(Model &model, unsigned int v, const BoundingList &bs_A);
+  Compress(Model &model, int v, const BoundingList &bs_A);
 
   void updateColouring() override;
 

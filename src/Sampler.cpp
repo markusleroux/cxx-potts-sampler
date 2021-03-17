@@ -3,8 +3,6 @@
 //
 
 #include "Sampler.h"
-#include "Update.h"
-#include <boost/variant.hpp>
 
 /// \class updateVisitor
 /// \brief visitor for use with boost::variant<Compress, Contract>
@@ -36,10 +34,10 @@ iteration_t Sampler::iteration() {
 
   //	Phase One
   BoundingList A(model.q);
-  for (unsigned int v = 0; v < model.getSize(); v++) {
+  for (int v = 0; v < model.getSize(); v++) {
     //		set A for the neighbourhood of v
     A = model.bs_generateA(v, model.Delta);
-    for (unsigned int w : model.getNeighboursIndex(v)) {
+    for (int w : model.getNeighboursIndex(v)) {
       if (w > v) {
         seeds.emplace_back(Compress(model, w, A));
         boost::get<Compress>(seeds.back()).update();
@@ -51,8 +49,8 @@ iteration_t Sampler::iteration() {
   }
 
   //	Phase Two
-  unsigned int v;
-  for (unsigned int i = 0; i < T; i++) {
+  int v;
+  for (int i = 0; i < T; i++) {
     // choose v uniformly at random
     BoundingList bl(model.getSize());
     bl.flip();
@@ -67,7 +65,7 @@ iteration_t Sampler::iteration() {
 /// sample from the anti-ferromagnetic Potts model using the algorithm
 void Sampler::sample() {
   //	iterate until boundingChainIsConstant holds
-	unsigned int t;
+	int t;
 	for (t = 0; not boundingChainIsConstant(); t++) {
     try {
       writeHistory(iteration());
@@ -92,9 +90,9 @@ void Sampler::sample() {
 
 /// generate the time to run the second phase in order to ensure expected
 /// polynomial run-time
-unsigned int Sampler::generateT(const Model &m) {
+int Sampler::generateT(const Model &m) {
   return m.getSize() + 1 + m.getEdgeCount() +
-         (unsigned int)(pow(m.getSize(), 2) *
+         (int)(pow(m.getSize(), 2) *
                         (m.q -
                          m.Delta * (1 - m.B) / (m.q - m.Delta * (3 - m.B))));
 }

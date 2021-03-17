@@ -1,13 +1,13 @@
 #include "Model.h"
 #include "Sampler.h"
-#include <algorithm>
+#include <boost/dynamic_bitset.hpp>
 
-BoundingList::BoundingList(const unsigned q,
-                           const std::vector<unsigned> &boundingList)
-    : boost::dynamic_bitset<>(q) {
-  for (unsigned colour : boundingList) {
+BoundingList::BoundingList(const int q,
+                           const std::vector<int> &boundingList)
+    : boost::dynamic_bitset<>((unsigned long) q) {
+  for (int colour : boundingList) {
     if (colour >= 0 && colour < q) {
-      set(colour);
+      set(static_cast<unsigned long>(colour));
     } else {
       throw std::invalid_argument(
           "Bounding list must be a subset of {0, ..., q - 1}");
@@ -15,17 +15,17 @@ BoundingList::BoundingList(const unsigned q,
   }
 }
 
-BoundingList::BoundingList(const unsigned q) : boost::dynamic_bitset<>(q) {}
+BoundingList::BoundingList(const int q) : boost::dynamic_bitset<>((unsigned long) q) {}
 
 /// unset all bits after the kth set bit
 /// \sa bs_generateA
 /// \param k the number of bits set in after atMostKUp has been applied
 /// \return a copy of bs with all set bits after the kth set bit unset
-void BoundingList::atMostKUp(unsigned int k) {
+void BoundingList::atMostKUp(int k) {
   for (int i = 0; i < size(); i++) {
-    if (test(i) && k == 0) {
-      reset(i);
-    } else if (test(i)) {
+    if (test(static_cast<unsigned long>(i)) && k == 0) {
+      reset(static_cast<unsigned long>(i));
+    } else if (test(static_cast<unsigned long>(i))) {
       k--;
     }
   }
@@ -35,8 +35,8 @@ void BoundingList::atMostKUp(unsigned int k) {
 /// \param vertices
 /// \return the bitwise OR of the bounding list bitsets
 BoundingList
-BoundingList::unionOfLists(const std::vector<BoundingList> &lists, unsigned q) {
-  BoundingList result{static_cast<unsigned int>(q)};      // q won't be so large
+BoundingList::unionOfLists(const std::vector<BoundingList> &lists, int q) {
+  BoundingList result{q};
   for (const BoundingList& bl : lists) {
     result |= bl;
   }
@@ -59,16 +59,16 @@ std::mt19937 Model::mersene_gen{std::random_device{}()};
 /// \param Delta the maximum degree of the graph
 /// \param B controls the strength of the interactions between vertices
 /// \param edges
-Model::Model(unsigned int n, unsigned int q, unsigned int Delta, long double B,
+Model::Model(int n, int q, int Delta, long double B,
              const std::list<edge_t> &edges)
     : Graph(n, edges), q(q), Delta(Delta), B(B) {
   // Initialize vector of colours
-  colouring = std::vector<unsigned>(n);
+  colouring = std::vector<int>(static_cast<unsigned long>(n));
 
 	// Initialize bounding chain
 	BoundingList defaultBL(q);
 	defaultBL.set();
-	boundingChain = boundingchain_t(n, defaultBL);
+	boundingChain = boundingchain_t(static_cast<unsigned long>(n), defaultBL);
 }
 
 /// constructor for some generic graphs
@@ -78,22 +78,22 @@ Model::Model(unsigned int n, unsigned int q, unsigned int Delta, long double B,
 /// \param Delta the maximum degree of the graph
 /// \param B the strength of the interactions between vertices
 /// \return a model object
-Model::Model(unsigned int n, unsigned int q, unsigned int Delta, long double B,
+Model::Model(int n, int q, int Delta, long double B,
              const std::string &type)
     : Graph(n, type), q(q), Delta(Delta), B(B) {
   // Initialize vector of colours
-  colouring = colouring_t(n);
+  colouring = colouring_t(static_cast<unsigned long>(n));
 
   // Initialize bounding chain
 	BoundingList defaultBL(q);
 	defaultBL.set();
-  boundingChain = boundingchain_t(n, defaultBL);
+  boundingChain = boundingchain_t(static_cast<unsigned long>(n), defaultBL);
 }
 
 /// A setter for vertex colour which respects bounding lists when
 /// checkBoundingList == true \param v the vertex to update \param c the new
 /// colour for v
-void Model::setColour(unsigned int v, unsigned int c) {
+void Model::setColour(int v, int c) {
   if ((not checkBoundingList) || getBoundingList(v)[c]) {
     colouring[v] = c;
   } else {
@@ -105,8 +105,8 @@ void Model::setColour(unsigned int v, unsigned int c) {
 /// Return the number of occurrences of each colour in the neighbours of a
 /// vertex \param v the vertex to consider \return a vector describing the
 /// number of occurrences of each colour in the neighbourhood
-std::vector<unsigned int> Model::getNeighbourhoodColourCount(unsigned v) const {
-  std::vector<unsigned> count(q);
+std::vector<int> Model::getNeighbourhoodColourCount(int v) const {
+  std::vector<int> count(static_cast<unsigned long>(q));
   for (int neighbour : getNeighboursIndex(v)) {
     count[getColour(neighbour)]++;
   }
@@ -117,7 +117,7 @@ std::vector<unsigned int> Model::getNeighbourhoodColourCount(unsigned v) const {
 /// \param v the vertex whose neighbourhood to consider
 /// \return	a bitset with set bits where a colour is in a bounding list of
 /// size greater than one in the neighbourhood
-BoundingList Model::bs_getUnfixedColours(unsigned int v) const {
+BoundingList Model::bs_getUnfixedColours(int v) const {
   //	initialize result, noting that if a vertex has no neighbours then this
   // correctly defaults to all unset
   BoundingList result(q);
@@ -142,7 +142,7 @@ BoundingList Model::bs_getUnfixedColours(unsigned int v) const {
 /// \param v the vertex whose neighbourhood to consider
 /// \return a vector listing the colours which are only in a bounding list of
 /// size greater than one in the neighbourhood
-std::vector<unsigned int> Model::getUnfixedColours(unsigned int v) const {
+std::vector<int> Model::getUnfixedColours(int v) const {
   return getIndexVector<BoundingList>(bs_getUnfixedColours(v));
 }
 
@@ -151,7 +151,7 @@ std::vector<unsigned int> Model::getUnfixedColours(unsigned int v) const {
 /// \param v the vertex whose neighbourhood to consider
 /// \return	a bitset with set bits where a colour is only in bounding lists
 /// of size one, or in no bounding lists in the neighbourhood
-BoundingList Model::bs_getFixedColours(unsigned int v) const {
+BoundingList Model::bs_getFixedColours(int v) const {
   BoundingList result = bs_getUnfixedColours(v);
   result.flip();
   return result;
@@ -162,7 +162,7 @@ BoundingList Model::bs_getFixedColours(unsigned int v) const {
 /// \param v the vertex whose neighbourhood to consider
 /// \return a vector listing the colours which only occur in bounding lists of
 /// size one, or in no bounding lists in the neighbourhood
-std::vector<unsigned int> Model::getFixedColours(unsigned int v) const {
+std::vector<int> Model::getFixedColours(int v) const {
   return getIndexVector<BoundingList>(bs_getFixedColours(v));
 }
 
@@ -172,7 +172,7 @@ std::vector<unsigned int> Model::getFixedColours(unsigned int v) const {
 /// \param c the colour to consider
 /// \return the number of occurrences of the colour c on the neighbours of v
 /// where the bounding list on the neighbour also has size one
-unsigned int Model::m_Q(unsigned int v, unsigned int c) const {
+int Model::m_Q(int v, int c) const {
   int result = 0;
   BoundingList boundingList(q);
 
@@ -189,12 +189,12 @@ unsigned int Model::m_Q(unsigned int v, unsigned int c) const {
 /// Setter for the bounding list at a vertex
 /// \param v the vertex with the bounding list which is modified
 /// \param boundingList the new bounding list for vertex v
-void Model::setBoundingList(unsigned int v,
-                            const std::vector<unsigned int> &boundingList) {
+void Model::setBoundingList(int v,
+                            const std::vector<int> &boundingList) {
   boundingChain[v] = BoundingList{q, boundingList};
 }
 
-std::vector<BoundingList> Model::getBoundingLists(const std::vector<unsigned> &vertices) const {
+std::vector<BoundingList> Model::getBoundingLists(const std::vector<int> &vertices) const {
 	std::vector<BoundingList> result(vertices.size());
 	for (int i = 0; i < vertices.size(); i++) {
 		result[i] = getBoundingList(vertices[i]);
@@ -205,8 +205,8 @@ std::vector<BoundingList> Model::getBoundingLists(const std::vector<unsigned> &v
 /// Return the `minimal' set A maximally intersecting the bounding lists of
 /// greater neighbours of v \param v the vertex \param size the size of the
 /// set A to return \return a bitset describing the set A
-BoundingList Model::bs_generateA(unsigned int v, unsigned int size) const {
-  std::vector<unsigned> vertices = getNeighboursIndex(v);
+BoundingList Model::bs_generateA(int v, int size) const {
+  std::vector<int> vertices = getNeighboursIndex(v);
 
   //	remove neighbours which are less than v
   vertices.erase(std::remove_if(vertices.begin(), vertices.end(),
@@ -219,11 +219,11 @@ BoundingList Model::bs_generateA(unsigned int v, unsigned int size) const {
   A.atMostKUp(size);
 
   //	add more colours if A is smaller than size
-  for (int i = 0, count = A.count(); size - count > 0; count++) {
+  for (int i = 0, count = static_cast<int>(A.count()); size - count > 0; count++) {
     while (A[i]) {
       i++;
     }
-    A.flip(i);
+    A.flip(static_cast<unsigned long>(i));
   }
 
   return A;
@@ -239,9 +239,9 @@ void Model::sample() {
 /// constructor for the graph class
 /// \param n the number of vertices in the graph
 /// \param edges
-Graph::Graph(unsigned n, const std::__1::list<edge_t> &edges) {
+Graph::Graph(int n, const std::__1::list<edge_t> &edges) {
   // Initialize matrix of size n x n
-  adjacencyMatrix = adjmatrix_t(n, std::vector<bool>(n));
+  adjacencyMatrix = adjmatrix_t(static_cast<unsigned long>(n), std::vector<bool>(static_cast<unsigned long>(n)));
 
   // Populate adjacencyMatrix with edges
   for (edge_t edge : edges) {
@@ -250,13 +250,13 @@ Graph::Graph(unsigned n, const std::__1::list<edge_t> &edges) {
   }
 }
 
-Graph::Graph(unsigned n, const std::string &type)
+Graph::Graph(int n, const std::string &type)
     : Graph(n, buildEdgeSet(n, type)) {}
 
 /// helper function for constructing a set of edges
 /// \param n the number of vertices in the graph
 /// \param type the type of the graph (one of cycle, complete)
-std::__1::list<edge_t> Graph::buildEdgeSet(unsigned n, const std::string &type) {
+std::__1::list<edge_t> Graph::buildEdgeSet(int n, const std::string &type) {
 	std::__1::list<edge_t> edges;
 	if (type == "cycle") {
 		for (int i = 0; i + 1 < n; i++) {
@@ -281,8 +281,8 @@ std::__1::list<edge_t> Graph::buildEdgeSet(unsigned n, const std::string &type) 
 }
 
 /// return the number of edges in the graph
-unsigned Graph::getEdgeCount() const {
-  unsigned total{0};
+int Graph::getEdgeCount() const {
+  int total{0};
   for (std::vector<bool> neighbours : adjacencyMatrix) {
     total += std::count(neighbours.begin(), neighbours.end(), true);
   }

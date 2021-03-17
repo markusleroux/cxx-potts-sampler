@@ -1,7 +1,7 @@
 #include "Model.h"
 #include <boost/program_options.hpp>
 
-static bool checkParameters(unsigned q, unsigned Delta, long double B) {
+static bool checkParameters(int q, int Delta, long double B) {
 	if (Delta < 3) {
 		std::cout << "Delta must be greater than 2.\n";
 	} else if (q <= 2 * Delta) {
@@ -26,11 +26,11 @@ int main(int argc, char **argv) {
   description.add_options()("help,h", "Display this help message")(
       "parameter,B", po::value<long double>()->default_value((long double)0.5),
       "Parameter B controls the strength of interactions; must be in the "
-      "interval (0, 1)")("colours,q", po::value<unsigned int>()->required(),
+      "interval (0, 1)")("colours,q", po::value<int>()->required(),
                          "Number of colours")(
-      "delta,d", po::value<unsigned int>()->required(),
+      "delta,d", po::value<int>()->required(),
       "Maximum degree of graph")(
-      "number,n", po::value<unsigned int>()->required(), "Number of vertices")(
+      "number,n", po::value<int>()->required(), "Number of vertices")(
       "type,t", po::value<std::string>()->default_value("cycle"),
       "Type of graph");
 
@@ -42,9 +42,9 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  unsigned n = vm["number"].as<unsigned int>();
-  unsigned q = vm["colours"].as<unsigned int>();
-  unsigned Delta = vm["delta"].as<unsigned int>();
+  int n = vm["number"].as<int>();
+  int q = vm["colours"].as<int>();
+  int Delta = vm["delta"].as<int>();
   long double B = vm["parameter"].as<long double>();
 
   //  check if parameters match conditions for theorem

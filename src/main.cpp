@@ -2,6 +2,15 @@
 #include <boost/program_options.hpp>
 
 static bool checkParameters(unsigned q, unsigned Delta, long double B) {
+	if (Delta < 3) {
+		std::cout << "Delta must be greater than 2.\n";
+	} else if (q <= 2 * Delta) {
+		std::cout << "The number of colours q must be greater than 2 * Delta.\n";
+	} else if (B >= 1) {
+		std::cout << "B must be less than 1.\n";
+	} else if (B <= 1 - (long double)(q - 2 * Delta) / Delta) {
+		std::cout << "B, Delta and q must satisfy B > 1 - (q - 2 * Delta) / Delta, i.e. B > " + std::to_string(1 - (long double)(q - 2 * Delta) / Delta) + "\n";
+	}
   return (q > 2 * Delta) && (Delta >= 3) &&
          (B > 1 - (long double)(q - 2 * Delta) / Delta) && (B < 1);
 }
@@ -41,13 +50,7 @@ int main(int argc, char **argv) {
   //  check if parameters match conditions for theorem
   //  note that the algorithm still works if B is not in the correct interval,
   //  but there is no guarantee
-  if (not checkParameters(q, Delta, B)) {
-    std::cout << "Parameters don't meet conditions of theorem.\n";
-    std::cout << "Try setting B in the interval ("
-              << std::to_string(1 - (long double)(q - 2 * Delta) / Delta)
-              << ", 1)\n";
-    return 0;
-  }
+  if (not checkParameters(q, Delta, B)) { return 0; }
 
   try {
     Model m(n, q, Delta, B, vm["type"].as<std::string>());

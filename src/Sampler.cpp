@@ -3,8 +3,7 @@
 //
 
 #include "Sampler.h"
-#include "Compress.h"
-#include "Contract.h"
+#include "Update.h"
 #include <boost/variant.hpp>
 
 /// \class updateVisitor

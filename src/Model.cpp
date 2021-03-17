@@ -31,15 +31,19 @@ void BoundingList::atMostKUp(unsigned int k) {
   }
 }
 
+/// Return the union of the bounding lists at all the vertices
+/// \param vertices
+/// \return the bitwise OR of the bounding list bitsets
 BoundingList
-BoundingList::unionOfLists(const std::vector<BoundingList> &lists) {
-  BoundingList result{static_cast<unsigned int>(lists[0].size())};      // q won't be so large
+BoundingList::unionOfLists(const std::vector<BoundingList> &lists, unsigned q) {
+  BoundingList result{static_cast<unsigned int>(q)};      // q won't be so large
   for (const BoundingList& bl : lists) {
     result |= bl;
   }
   return result;
 }
 
+// \brief analogous to flip but not in place
 BoundingList BoundingList::C() const {
 	BoundingList result{*this};
 	result.flip();
@@ -190,17 +194,12 @@ void Model::setBoundingList(unsigned int v,
   boundingChain[v] = BoundingList{q, boundingList};
 }
 
-/// Return the union of the bounding lists at all the vertices
-/// \param vertices
-/// \return the bitwise OR of the bounding list bitsets
-BoundingList
-Model::UnionOfBoundingLists(const std::vector<unsigned int> &vertices) const {
-  BoundingList result(q);
-  for (unsigned w : vertices) {
-    result |= getBoundingList(w);
-  }
-
-  return result;
+std::vector<BoundingList> Model::getBoundingLists(const std::vector<unsigned> &vertices) const {
+	std::vector<BoundingList> result(vertices.size());
+	for (int i = 0; i < vertices.size(); i++) {
+		result[i] = getBoundingList(vertices[i]);
+	}
+	return result;
 }
 
 /// Return the `minimal' set A maximally intersecting the bounding lists of
@@ -214,7 +213,7 @@ BoundingList Model::bs_generateA(unsigned int v, unsigned int size) const {
                                 [&v](int w) { return w < v; }),
                  vertices.end());
 
-  BoundingList A = UnionOfBoundingLists(vertices);
+  BoundingList A = BoundingList::unionOfLists(getBoundingLists(vertices), q);
 
   //	ensure A has size at most size
   A.atMostKUp(size);
@@ -235,4 +234,57 @@ BoundingList Model::bs_generateA(unsigned int v, unsigned int size) const {
 void Model::sample() {
   Sampler sampler(*this);
   sampler.sample();
+}
+
+/// constructor for the graph class
+/// \param n the number of vertices in the graph
+/// \param edges
+Graph::Graph(unsigned n, const std::__1::list<edge_t> &edges) {
+  // Initialize matrix of size n x n
+  adjacencyMatrix = adjmatrix_t(n, std::vector<bool>(n));
+
+  // Populate adjacencyMatrix with edges
+  for (edge_t edge : edges) {
+    adjacencyMatrix[edge.first][edge.second] = true;
+    adjacencyMatrix[edge.second][edge.first] = true;
+  }
+}
+
+Graph::Graph(unsigned n, const std::string &type)
+    : Graph(n, buildEdgeSet(n, type)) {}
+
+/// helper function for constructing a set of edges
+/// \param n the number of vertices in the graph
+/// \param type the type of the graph (one of cycle, complete)
+std::__1::list<edge_t> Graph::buildEdgeSet(unsigned n, const std::string &type) {
+	std::__1::list<edge_t> edges;
+	if (type == "cycle") {
+		for (int i = 0; i + 1 < n; i++) {
+			edges.emplace_back(i, i + 1);
+		}
+		if (n > 2) {
+			edges.emplace_back(n - 1, 0);
+		}
+	} else if (type == "complete") {
+		int j;
+		for (int i = 0; i < n; i++) {
+			for (j = 0; j < n; j++) {
+				if (i != j) {
+					edges.emplace_back(i, j);
+				}
+			}
+		}
+	} else {
+		throw std::invalid_argument("Invalid graph type.");
+	}
+	return edges;
+}
+
+/// return the number of edges in the graph
+unsigned Graph::getEdgeCount() const {
+  unsigned total{0};
+  for (std::vector<bool> neighbours : adjacencyMatrix) {
+    total += std::count(neighbours.begin(), neighbours.end(), true);
+  }
+  return total / 2;
 }

@@ -5,8 +5,6 @@
 #ifndef POTTSSAMPLER_SAMPLER_H
 #define POTTSSAMPLER_SAMPLER_H
 
-#include "Compress.h"
-#include "Contract.h"
 #include "Model.h"
 #include "Update.h"
 #include <boost/variant.hpp>

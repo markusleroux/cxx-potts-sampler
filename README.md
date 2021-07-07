@@ -10,7 +10,16 @@ cd cxx-potts-sampler/build
 cmake ..
 cmake --build .
 ```
-The build process has been tested on OSX, but should work on any *nix system.
+
+The build process should work with gcc and stdlibc++, boost and catch2 installed.
+
+For an alternative that bundles the dependencies, a Dockerfile has been included. To use the Dockerfile:
+```shell
+cd cxx-potts-sampler
+docker build -t potts-sampler .
+docker run -it potts-sampler [OPTIONS]
+```
+This will download an install an alpine container with all the necessary dependencies (~500MB) and then run the sampler with default values. OPTIONS are passed to the sampler, e.g. `docker run -it potts-sampler -B 0.95 -q 7 -d 3 -n 10 -t cycle` calls `sampler -B 0.95 -q 7 -d 3 -n 10 -t cycle`.
 
 ## Generating samples
 
@@ -29,3 +38,7 @@ vertices can be generated as follows:
 ```shell
 sampler -B 0.95 -q 7 -d 3 -n 10 -t cycle
 ```
+
+## Output
+
+The output of the algorithm is a list of entries ```vertex (colour) : { neighbours }``` where `vertex` is the vertex number, `colour` is a number in the range [0, q) and `neighbours` is the set of neighbours of the vertex.

@@ -60,7 +60,7 @@ std::mt19937 Model::mersene_gen{std::random_device{}()};
 /// \param B controls the strength of the interactions between vertices
 /// \param edges
 Model::Model(int n, int q, int Delta, long double B,
-             const std::list<edge_t> &edges)
+             const std::vector<edge_t> &edges)
     : Graph(n, edges), q(q), Delta(Delta), B(B) {
   // Initialize vector of colours
   colouring = std::vector<int>(static_cast<unsigned long>(n));
@@ -239,7 +239,7 @@ void Model::sample() {
 /// constructor for the graph class
 /// \param n the number of vertices in the graph
 /// \param edges
-Graph::Graph(int n, const std::__1::list<edge_t> &edges) {
+Graph::Graph(int n, const std::vector<edge_t> &edges) {
   // Initialize matrix of size n x n
   adjacencyMatrix = adjmatrix_t(static_cast<unsigned long>(n), std::vector<bool>(static_cast<unsigned long>(n)));
 
@@ -256,8 +256,8 @@ Graph::Graph(int n, const std::string &type)
 /// helper function for constructing a set of edges
 /// \param n the number of vertices in the graph
 /// \param type the type of the graph (one of cycle, complete)
-std::__1::list<edge_t> Graph::buildEdgeSet(int n, const std::string &type) {
-	std::__1::list<edge_t> edges;
+std::vector<edge_t> Graph::buildEdgeSet(int n, const std::string &type) {
+	std::vector<edge_t> edges;
 	if (type == "cycle") {
 		for (int i = 0; i + 1 < n; i++) {
 			edges.emplace_back(i, i + 1);

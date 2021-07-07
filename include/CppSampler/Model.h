@@ -8,7 +8,6 @@
 #include <random>
 #include <boost/dynamic_bitset.hpp>
 #include <iostream>
-#include <list>
 #include <vector>
 
 /// template which returns the indices of the set bits
@@ -49,7 +48,7 @@ class Graph {
 				adjmatrix_t adjacencyMatrix;
 
 		public:
-				Graph(int n, const std::__1::list<edge_t> &edges);
+				Graph(int n, const std::vector<edge_t> &edges);
 
 				Graph(int n, const std::string &type);
 
@@ -68,7 +67,7 @@ class Graph {
 					return getIndexVector<std::vector<bool>>(getNeighboursBool((v)));
 				}
 
-				static std::__1::list<edge_t> buildEdgeSet(int n,
+				static std::vector<edge_t> buildEdgeSet(int n,
 				                                           const std::string &type);
 };
 
@@ -113,7 +112,7 @@ private:
 
 public:
   Model(int n, int q, int Delta, long double B,
-        const std::list<edge_t> &edges);
+        const std::vector<edge_t> &edges);
 
   Model(int n, int q, int Delta, long double B,
         const std::string &type);
@@ -150,9 +149,10 @@ public:
 /// Overload << to print vector contents
 template <typename element_type>
 static std::ostream &operator<<(std::ostream &out,
-                                const std::__1::vector<element_type> &vector) {
+                                const std::vector<element_type> &vector) {
   if (not vector.empty()) {
-    for (auto it = std::begin(vector); it != std::prev(std::end(vector));
+    for (auto it = std::begin(vector); 
+	 it != std::prev(std::end(vector));
          it++) {
       out << *it << ",";
     }
@@ -164,7 +164,9 @@ static std::ostream &operator<<(std::ostream &out,
 /// Overload << to for graph (adjacency matrix)
 static std::ostream &operator<<(std::ostream &out, const Graph &graph) {
   for (int v = 0; v < graph.getSize(); v++) {
-    out << v << ": {" << graph.getNeighboursIndex(v) << "}\n";
+    out << v << ": {";
+    for (auto n : graph.getNeighboursIndex(v))
+	    out << "}\n";
   }
   return out;
 }
@@ -172,7 +174,10 @@ static std::ostream &operator<<(std::ostream &out, const Graph &graph) {
 // Overload << for model
 static std::ostream &operator<<(std::ostream &out, const Model &model) {
 	for (int v = 0; v < model.getSize(); v++) {
-		out << v << " (" << model.getColour(v) << ") : {" << model.getNeighboursIndex(v) << "}\n";
+		out << v << " (" << model.getColour(v) << ") : {";
+		for (auto v : model.getNeighboursIndex(v))
+			out << ' ' << v;
+		out << " }\n";
 	}
 	return out;
 }

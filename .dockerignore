@@ -1,0 +1,22 @@
+# Ignore all
+**
+
+!src/
+!include/
+!tests/
+
+!build/
+build/*
+
+!bin/
+bin/*
+
+.ccls*
+.DS_Store
+src/.DS_Store
+include/CppSampler/.DS_Store
+include/.DS_Store
+
+!CMakeLists.txt
+
+!README.md

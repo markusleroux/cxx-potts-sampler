@@ -3,4 +3,4 @@
 //
 
 #define CATCH_CONFIG_MAIN
-#include "../include/Catch2/catch.hpp"
+#include "catch2/catch.hpp"

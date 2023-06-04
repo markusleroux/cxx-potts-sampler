@@ -4,7 +4,9 @@ add_executable(tests
         main.cpp
         model.test.cpp
         update.test.cpp
-        sampler.test.cpp TestClasses.h)
+        sampler.test.cpp 
+        TestClasses.h
+        )
 
 target_link_libraries(tests src Catch2::Catch2)
 target_compile_features(tests PUBLIC cxx_std_17)

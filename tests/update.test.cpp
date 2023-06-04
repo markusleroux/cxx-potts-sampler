@@ -2,8 +2,12 @@
 // Created by Markus Le Roux on 2021-03-17.
 //
 
-#include "../include/Catch2/catch.hpp"
+#include <set>
+
+#include "catch2/catch.hpp"
+
 #include "TestClasses.h"
+
 
 TEST_CASE("update class", "[Update]") {
   ModelTest mdl(5, 7, 3, 0.99, "cycle");

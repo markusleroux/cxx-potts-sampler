@@ -2,7 +2,7 @@
 // Created by Markus Le Roux on 2021-03-17.
 //
 
-#include "../include/Catch2/catch.hpp"
+#include "catch2/catch.hpp"
 
 #include "TestClasses.h"
 #include <vector>

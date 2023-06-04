@@ -27,8 +27,8 @@ int Update::bs_uniformSample(const BoundingList &bs) {
 /// \param B the base B
 /// \param counts a vector containing the exponent
 /// \return a vector of weights B^c
-std::vector<long double>
-Update::computeWeights(long double B, std::vector<int> counts) {
+std::vector<long double> Update::computeWeights(long double B,
+                                                std::vector<int> counts) {
   std::vector<long double> weights(counts.size());
   std::transform(counts.begin(), counts.end(), weights.begin(),
                  [B](int m_c) { return pow(B, m_c); });
@@ -45,8 +45,7 @@ Contract::Contract(Model &model, int v)
 /// \param m the model to update
 /// \param v the vertex to update
 /// \param c1 the proposal for the new colour of v
-Contract::Contract(Model &m, int v, int c1)
-    : Update(m, v, c1) {
+Contract::Contract(Model &m, int v, int c1) : Update(m, v, c1) {
   unfixedCount = static_cast<int>(model.bs_getUnfixedColours(v).count());
 
   std::vector<long double> weights(static_cast<unsigned long>(model.q));
@@ -73,8 +72,7 @@ long double Contract::colouringGammaCutoff() const {
       computeWeights(model.B, model.getNeighbourhoodColourCount(v));
   long double Z =
       std::accumulate(weights.begin(), weights.end(), (long double)0.0);
-  return (pow(model.B, weights[c1])) * (long double)unfixedCount /
-         Z;
+  return (pow(model.B, weights[c1])) * (long double)unfixedCount / Z;
 }
 
 /// compute the cutoff used to set the bounding chain
@@ -124,9 +122,8 @@ Compress::Compress(Model &model, int v, const BoundingList &bs_A)
 /// \param v the vertex to update
 /// \param bs_A the set A, common to all the compress updates in a neighbourhood
 /// \sa Model::bs_generateA
-Compress::Compress(Model &model, int v, int c1,
-                   const BoundingList &bs_A)
-    : Update(model, v, c1), A(bs_A){}
+Compress::Compress(Model &model, int v, int c1, const BoundingList &bs_A)
+    : Update(model, v, c1), A(bs_A) {}
 
 /// compute the cutoff used to choose between c1 and c2
 /// \sa updateColouring
@@ -187,7 +184,7 @@ void Compress::updateColouring() {
 /// update the bounding list using the seed
 void Compress::updateBoundingChain() {
   BoundingList bs(model.q);
-  bs.set((unsigned long) c1);
+  bs.set((unsigned long)c1);
   bs |= A;
 
   model.boundingChain[v] = bs;

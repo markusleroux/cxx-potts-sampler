@@ -65,8 +65,8 @@ iteration_t Sampler::iteration() {
 /// sample from the anti-ferromagnetic Potts model using the algorithm
 void Sampler::sample() {
   //	iterate until boundingChainIsConstant holds
-	int t;
-	for (t = 0; not boundingChainIsConstant(); t++) {
+  int t;
+  for (t = 0; not boundingChainIsConstant(); t++) {
     try {
       writeHistory(iteration());
     } catch (const std::runtime_error &err) {
@@ -77,7 +77,7 @@ void Sampler::sample() {
 
   //	apply history
   model.setBoundingListChecks(false);
-	t = 0;
+  t = 0;
   for (auto it = ++history.rbegin(); it != history.rend(); it++, t++) {
     try {
       updateColourWithSeeds(*it);
@@ -93,8 +93,7 @@ void Sampler::sample() {
 int Sampler::generateT(const Model &m) {
   return m.getSize() + 1 + m.getEdgeCount() +
          (int)(pow(m.getSize(), 2) *
-                        (m.q -
-                         m.Delta * (1 - m.B) / (m.q - m.Delta * (3 - m.B))));
+               (m.q - m.Delta * (1 - m.B) / (m.q - m.Delta * (3 - m.B))));
 }
 
 /// predicate which holds if the bounding lists have size one at every vertex of

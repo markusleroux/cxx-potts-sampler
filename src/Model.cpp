@@ -2,9 +2,8 @@
 #include "Sampler.h"
 #include <boost/dynamic_bitset.hpp>
 
-BoundingList::BoundingList(const int q,
-                           const std::vector<int> &boundingList)
-    : boost::dynamic_bitset<>((unsigned long) q) {
+BoundingList::BoundingList(const int q, const std::vector<int> &boundingList)
+    : boost::dynamic_bitset<>((unsigned long)q) {
   for (int colour : boundingList) {
     if (colour >= 0 && colour < q) {
       set(static_cast<unsigned long>(colour));
@@ -15,7 +14,8 @@ BoundingList::BoundingList(const int q,
   }
 }
 
-BoundingList::BoundingList(const int q) : boost::dynamic_bitset<>((unsigned long) q) {}
+BoundingList::BoundingList(const int q)
+    : boost::dynamic_bitset<>((unsigned long)q) {}
 
 /// unset all bits after the kth set bit
 /// \sa bs_generateA
@@ -34,10 +34,10 @@ void BoundingList::atMostKUp(int k) {
 /// Return the union of the bounding lists at all the vertices
 /// \param vertices
 /// \return the bitwise OR of the bounding list bitsets
-BoundingList
-BoundingList::unionOfLists(const std::vector<BoundingList> &lists, int q) {
+BoundingList BoundingList::unionOfLists(const std::vector<BoundingList> &lists,
+                                        int q) {
   BoundingList result{q};
-  for (const BoundingList& bl : lists) {
+  for (const BoundingList &bl : lists) {
     result |= bl;
   }
   return result;
@@ -45,9 +45,9 @@ BoundingList::unionOfLists(const std::vector<BoundingList> &lists, int q) {
 
 // \brief analogous to flip but not in place
 BoundingList BoundingList::C() const {
-	BoundingList result{*this};
-	result.flip();
-	return result;
+  BoundingList result{*this};
+  result.flip();
+  return result;
 }
 
 /// a seed for random number generators
@@ -65,10 +65,10 @@ Model::Model(int n, int q, int Delta, long double B,
   // Initialize vector of colours
   colouring = std::vector<int>(static_cast<unsigned long>(n));
 
-	// Initialize bounding chain
-	BoundingList defaultBL(q);
-	defaultBL.set();
-	boundingChain = boundingchain_t(static_cast<unsigned long>(n), defaultBL);
+  // Initialize bounding chain
+  BoundingList defaultBL(q);
+  defaultBL.set();
+  boundingChain = boundingchain_t(static_cast<unsigned long>(n), defaultBL);
 }
 
 /// constructor for some generic graphs
@@ -78,15 +78,14 @@ Model::Model(int n, int q, int Delta, long double B,
 /// \param Delta the maximum degree of the graph
 /// \param B the strength of the interactions between vertices
 /// \return a model object
-Model::Model(int n, int q, int Delta, long double B,
-             const std::string &type)
+Model::Model(int n, int q, int Delta, long double B, const std::string &type)
     : Graph(n, type), q(q), Delta(Delta), B(B) {
   // Initialize vector of colours
   colouring = colouring_t(static_cast<unsigned long>(n));
 
   // Initialize bounding chain
-	BoundingList defaultBL(q);
-	defaultBL.set();
+  BoundingList defaultBL(q);
+  defaultBL.set();
   boundingChain = boundingchain_t(static_cast<unsigned long>(n), defaultBL);
 }
 
@@ -189,17 +188,17 @@ int Model::m_Q(int v, int c) const {
 /// Setter for the bounding list at a vertex
 /// \param v the vertex with the bounding list which is modified
 /// \param boundingList the new bounding list for vertex v
-void Model::setBoundingList(int v,
-                            const std::vector<int> &boundingList) {
+void Model::setBoundingList(int v, const std::vector<int> &boundingList) {
   boundingChain[v] = BoundingList{q, boundingList};
 }
 
-std::vector<BoundingList> Model::getBoundingLists(const std::vector<int> &vertices) const {
-	std::vector<BoundingList> result(vertices.size());
-	for (int i = 0; i < vertices.size(); i++) {
-		result[i] = getBoundingList(vertices[i]);
-	}
-	return result;
+std::vector<BoundingList>
+Model::getBoundingLists(const std::vector<int> &vertices) const {
+  std::vector<BoundingList> result(vertices.size());
+  for (int i = 0; i < vertices.size(); i++) {
+    result[i] = getBoundingList(vertices[i]);
+  }
+  return result;
 }
 
 /// Return the `minimal' set A maximally intersecting the bounding lists of
@@ -219,7 +218,8 @@ BoundingList Model::bs_generateA(int v, int size) const {
   A.atMostKUp(size);
 
   //	add more colours if A is smaller than size
-  for (int i = 0, count = static_cast<int>(A.count()); size - count > 0; count++) {
+  for (int i = 0, count = static_cast<int>(A.count()); size - count > 0;
+       count++) {
     while (A[i]) {
       i++;
     }
@@ -241,7 +241,9 @@ void Model::sample() {
 /// \param edges
 Graph::Graph(int n, const std::vector<edge_t> &edges) {
   // Initialize matrix of size n x n
-  adjacencyMatrix = adjmatrix_t(static_cast<unsigned long>(n), std::vector<bool>(static_cast<unsigned long>(n)));
+  adjacencyMatrix =
+      adjmatrix_t(static_cast<unsigned long>(n),
+                  std::vector<bool>(static_cast<unsigned long>(n)));
 
   // Populate adjacencyMatrix with edges
   for (edge_t edge : edges) {
@@ -257,27 +259,27 @@ Graph::Graph(int n, const std::string &type)
 /// \param n the number of vertices in the graph
 /// \param type the type of the graph (one of cycle, complete)
 std::vector<edge_t> Graph::buildEdgeSet(int n, const std::string &type) {
-	std::vector<edge_t> edges;
-	if (type == "cycle") {
-		for (int i = 0; i + 1 < n; i++) {
-			edges.emplace_back(i, i + 1);
-		}
-		if (n > 2) {
-			edges.emplace_back(n - 1, 0);
-		}
-	} else if (type == "complete") {
-		int j;
-		for (int i = 0; i < n; i++) {
-			for (j = 0; j < n; j++) {
-				if (i != j) {
-					edges.emplace_back(i, j);
-				}
-			}
-		}
-	} else {
-		throw std::invalid_argument("Invalid graph type.");
-	}
-	return edges;
+  std::vector<edge_t> edges;
+  if (type == "cycle") {
+    for (int i = 0; i + 1 < n; i++) {
+      edges.emplace_back(i, i + 1);
+    }
+    if (n > 2) {
+      edges.emplace_back(n - 1, 0);
+    }
+  } else if (type == "complete") {
+    int j;
+    for (int i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) {
+        if (i != j) {
+          edges.emplace_back(i, j);
+        }
+      }
+    }
+  } else {
+    throw std::invalid_argument("Invalid graph type.");
+  }
+  return edges;
 }
 
 /// return the number of edges in the graph

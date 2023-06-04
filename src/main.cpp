@@ -2,71 +2,65 @@
 #include <boost/program_options.hpp>
 
 static bool checkParameters(int q, int Delta, long double B) {
-  if (Delta < 3) {
-    std::cout << "Delta must be greater than 2.\n";
-  } else if (q <= 2 * Delta) {
-    std::cout << "The number of colours q must be greater than 2 * Delta.\n";
-  } else if (B >= 1) {
-    std::cout << "B must be less than 1.\n";
-  } else if (B <= 1 - (long double)(q - 2 * Delta) / Delta) {
-    std::cout << "B, Delta and q must satisfy B > 1 - (q - 2 * Delta) / Delta, "
-                 "i.e. B > " +
-                     std::to_string(1 - (long double)(q - 2 * Delta) / Delta) +
-                     "\n";
-  }
-  return (q > 2 * Delta) && (Delta >= 3) &&
-         (B > 1 - (long double)(q - 2 * Delta) / Delta) && (B < 1);
+    if (Delta < 3) {
+        std::cout << "Delta must be greater than 2." << std::endl;
+    } else if (q <= 2 * Delta) {
+        std::cout << "The number of colours q must be greater than 2 * Delta." << std::endl;
+    } else if (B >= 1) {
+        std::cout << "B must be less than 1." << std::endl;
+    } else if (B <= 1 - (long double)(q - 2 * Delta) / Delta) {
+        std::cout << "B, Delta and q must satisfy B > 1 - (q - 2 * Delta) / Delta, i.e. B > ";
+        std::cout << std::to_string(1 - (long double)(q - 2 * Delta) / Delta);
+        std::cout << std::endl;
+    }
+    return (q > 2 * Delta) && (Delta >= 3) && (B > 1 - (long double)(q - 2 * Delta) / Delta) && (B < 1);
 }
 
 int main(int argc, char **argv) {
-  // boost::program_options will handle command line parsing
-  namespace po = boost::program_options;
+    // boost::program_options will handle command line parsing
+    namespace po = boost::program_options;
 
-  po::variables_map vm;
-  po::options_description description("Allowed Options");
+    po::variables_map vm;
+    po::options_description description("Allowed Options");
 
-  // Declare arguments
-  description.add_options()("help,h", "Display this help message")(
-      "parameter,B", po::value<long double>()->default_value((long double)0.95),
-      "Parameter B controls the strength of interactions; must be in the "
-      "interval (0, 1)")
-
-      ("colours,q", po::value<int>()->required(), "Number of colours")
-
+    // Declare arguments
+    description.add_options()("help,h", "Display this help message")(
+        "parameter,B", po::value<long double>()->default_value((long double)0.95),
+        "Parameter B controls the strength of interactions; must be in the "
+        "interval (0, 1)"
+    )
+    ("colours,q", po::value<int>()->required(), "Number of colours")
           ("delta,d", po::value<int>()->required(), "Maximum degree of graph")
-
               ("number,n", po::value<int>()->required(), "Number of vertices")
+                  ("type,t", po::value<std::string>()->default_value("cycle"), "Type of graph");
 
-                  ("type,t", po::value<std::string>()->default_value("cycle"),
-                   "Type of graph");
+    // parse arguments and save them in the variable map (vm)
+    po::store(po::parse_command_line(argc, argv, description), vm);
 
-  // parse arguments and save them in the variable map (vm)
-  po::store(po::parse_command_line(argc, argv, description), vm);
-
-  if (vm.count("help")) {
-    std::cout << description << "\n";
-    return 1;
-  }
-
-  try {
-    int n = vm["number"].as<int>();
-    int q = vm["colours"].as<int>();
-    int Delta = vm["delta"].as<int>();
-    long double B = vm["parameter"].as<long double>();
-
-    //  check if parameters match conditions for theorem
-    //  note that the algorithm still works if B is not in the correct interval,
-    //  but there is no guarantee
-    if (not checkParameters(q, Delta, B)) {
-      return 1;
+    if (vm.count("help")) {
+        std::cout << description << "\n";
+        return 1;
     }
 
-    Model m(n, q, Delta, B, vm["type"].as<std::string>());
-    m.sample();
-    std::cout << m;
-  } catch (std::exception &e) {
-    std::cout << e.what() << "\n";
-    return 1;
-  }
-  return 0;
+    try {
+        int n = vm["number"].as<int>();
+        int q = vm["colours"].as<int>();
+        int Delta = vm["delta"].as<int>();
+        long double B = vm["parameter"].as<long double>();
+
+        //  check if parameters match conditions for theorem
+        //  note that the algorithm still works if B is not in the correct interval,
+        //  but there is no guarantee
+        if (not checkParameters(q, Delta, B)) {
+            return 1;
+        }
+
+        Model m(n, q, Delta, B, vm["type"].as<std::string>());
+        m.sample();
+        std::cout << m;
+    } catch (std::exception &e) {
+        std::cout << e.what() << "\n";
+        return 1;
+    }
+    return 0;
 }

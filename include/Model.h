@@ -6,9 +6,11 @@
 #define POTTSSAMPLER_MODEL_H
 
 #include <random>
-#include <boost/dynamic_bitset.hpp>
 #include <iostream>
 #include <vector>
+
+#include <boost/dynamic_bitset.hpp>
+
 
 /// template which returns the indices of the set bits
 /// \tparam bitset_t the type of the bitset
@@ -26,16 +28,17 @@ static std::vector<int> getIndexVector(bitset_t bs) {
 }
 
 class BoundingList : public boost::dynamic_bitset<> {
-		public:
-				BoundingList(int q, const std::vector<int> &boundingList);
-				explicit BoundingList(int q);
-				BoundingList() = default;
+public:
+    BoundingList(int q, const std::vector<int> &boundingList);
+    explicit BoundingList(int q);
+    BoundingList() = default;
 
-				void atMostKUp(int k);
-				static BoundingList unionOfLists(const std::vector<BoundingList> &lists, int q);
+    void atMostKUp(int k);
+    static BoundingList unionOfLists(const std::vector<BoundingList>& lists, int q);
 
-				BoundingList C() const;
+    BoundingList C() const;
 };
+
 
 typedef std::vector<std::vector<bool>> adjmatrix_t;
 typedef std::pair<int, int> edge_t;
@@ -44,139 +47,120 @@ typedef std::vector<int> colouring_t;
 
 /// \brief A class for graphs as adjacency matrices
 class Graph {
-		private:
-				adjmatrix_t adjacencyMatrix;
+public:
+    Graph(int n, const std::vector<edge_t> &edges);
+    Graph(int n, const std::string &type);
 
-		public:
-				Graph(int n, const std::vector<edge_t> &edges);
+    /// get the number of vertices in the graph
+    int getSize() const { return static_cast<int>(adjacencyMatrix.size()); }
 
-				Graph(int n, const std::string &type);
+    int getEdgeCount() const;
 
-				/// get the number of vertices in the graph
-				int getSize() const { return static_cast<int>(adjacencyMatrix.size()); }
+    /// getter for column v of the adjacency matrix
+    std::vector<bool> getNeighboursBool(int v) const {
+        return adjacencyMatrix[v];
+    }
 
-				int getEdgeCount() const;
+    /// a method which gets the indices of the neighbours of v
+    std::vector<int> getNeighboursIndex(int v) const {
+        return getIndexVector<std::vector<bool>>(getNeighboursBool((v)));
+    }
 
-				/// getter for column v of the adjacency matrix
-				std::vector<bool> getNeighboursBool(int v) const {
-					return adjacencyMatrix[v];
-				}
+    static std::vector<edge_t> buildEdgeSet(int n, const std::string &type);
 
-				/// a method which gets the indices of the neighbours of v
-				std::vector<int> getNeighboursIndex(int v) const {
-					return getIndexVector<std::vector<bool>>(getNeighboursBool((v)));
-				}
-
-				static std::vector<edge_t> buildEdgeSet(int n,
-				                                           const std::string &type);
+private:
+    adjmatrix_t adjacencyMatrix;
 };
 
 /// \brief a class for holding parameters of the model, the colourings and the
 /// bounding chain
 class Model : public Graph {
-private:
-  colouring_t colouring;
-  boundingchain_t boundingChain;
-  int q;
-  int Delta;
-  long double B;
-  static std::mt19937 mersene_gen;
-  bool checkBoundingList = true;
-
-  BoundingList bs_getUnfixedColours(int v) const;
-
-  BoundingList bs_getFixedColours(int v) const;
-
-  int m_Q(int v, int c) const;
-
-  void setColour(int v, int c);
-
-  /// setter for the checkBoundingList property
-  void setBoundingListChecks(bool b) { checkBoundingList = b; }
-
-  /// setter for bounding list
-  void setBoundingList(int v,
-                       const std::vector<int> &boundingList);
-
-  BoundingList bs_generateA(int v, int size) const;
-
-  friend class Update;
-
-  friend class Compress;
-
-  friend class Contract;
-
-  friend class Sampler;
-
-  friend class ModelTest;
-
 public:
-  Model(int n, int q, int Delta, long double B,
-        const std::vector<edge_t> &edges);
+    Model(int n, int q, int Delta, long double B, const std::vector<edge_t> &edges);
+    Model(int n, int q, int Delta, long double B, const std::string &type);
 
-  Model(int n, int q, int Delta, long double B,
-        const std::string &type);
+    /// get the colour of a specific vertex
+    int getColour(int v) const { return colouring[v]; }
 
-  /// get the colour of a specific vertex
-  int getColour(int v) const { return colouring[v]; }
+    /// get the current colouring of the graph
+    colouring_t getColouring() { return colouring; }
 
-  /// get the current colouring of the graph
-  colouring_t getColouring() { return colouring; }
+    std::vector<int> getUnfixedColours(int v) const;
+    std::vector<int> getFixedColours(int v) const;
+    std::vector<int> getNeighbourhoodColourCount(int v) const;
 
-  std::vector<int> getUnfixedColours(int v) const;
+    /// getter for the bounding chain
+    boundingchain_t getBoundingChain() const { return boundingChain; }
 
-  std::vector<int> getFixedColours(int v) const;
+    std::vector<BoundingList> getBoundingLists(const std::vector<int> &vertices) const;
 
-  std::vector<int> getNeighbourhoodColourCount(int v) const;
+    /// getter for the bounding list at vertex v
+    BoundingList getBoundingList(int v) const {
+        return boundingChain[v];
+    }
 
-	/// getter for the bounding chain
-	boundingchain_t getBoundingChain() const { return boundingChain; }
+    std::vector<int> getBoundingListIndex(int v) const {
+        return getIndexVector(getBoundingList(v));
+    }
 
-	std::vector<BoundingList> getBoundingLists(const std::vector<int> &vertices) const;
+    void sample();
 
-	/// getter for the bounding list at vertex v
-	BoundingList getBoundingList(int v) const {
-		return boundingChain[v];
-	}
+private:
+    colouring_t colouring;
+    boundingchain_t boundingChain;
+    int q;
+    int Delta;
+    long double B;
+    static std::mt19937 mersene_gen;
+    bool checkBoundingList = true;
 
-  std::vector<int> getBoundingListIndex(int v) const {
-    return getIndexVector(getBoundingList(v));
-  }
+    BoundingList bs_getUnfixedColours(int v) const;
+    BoundingList bs_getFixedColours(int v) const;
 
-  void sample();
+    int m_Q(int v, int c) const;
+    void setColour(int v, int c);
+
+    /// setter for the checkBoundingList property
+    void setBoundingListChecks(bool b) { checkBoundingList = b; }
+
+    /// setter for bounding list
+    void setBoundingList(int v, const std::vector<int> &boundingList);
+    BoundingList bs_generateA(int v, int size) const;
+
+    friend class Update;
+    friend class Compress;
+    friend class Contract;
+    friend class Sampler;
+    friend class ModelTest;
 };
 
-/// Overload << to print vector contents
 template <typename element_type>
-static std::ostream &operator<<(std::ostream &out,
-                                const std::vector<element_type> &vector) {
-  if (not vector.empty()) {
-    for (auto it = std::begin(vector); 
-	 it != std::prev(std::end(vector));
-         it++) {
-      out << *it << ",";
+static std::ostream &operator<<(std::ostream &out, const std::vector<element_type> &vector) {
+    if (not vector.empty()) {
+        for (auto it = std::begin(vector); it != std::prev(std::end(vector)); it++) {
+            out << *it << ",";
+        }
+        out << *std::prev(std::end(vector));
     }
-    out << *std::prev(std::end(vector));
-  }
-  return out;
+    return out;
 }
 
-/// Overload << to for graph (adjacency matrix)
 static std::ostream &operator<<(std::ostream &out, const Graph &graph) {
-  for (int v = 0; v < graph.getSize(); v++) {
-    out << v << ": {";
-    for (auto n : graph.getNeighboursIndex(v))
-	    out << "}\n";
-  }
-  return out;
+    for (int v = 0; v < graph.getSize(); v++) {
+        out << v << ": {";
+        for (auto n : graph.getNeighboursIndex(v)) {
+            out << "}\n";
+        }
+    }
+    return out;
 }
 
-// Overload << for model
 static std::ostream &operator<<(std::ostream &out, const Model &model) {
 	for (int v = 0; v < model.getSize(); v++) {
 		out << v << " (" << model.getColour(v) << ") : {";
-		for (auto v : model.getNeighboursIndex(v))
+		for (auto v : model.getNeighboursIndex(v)) {
 			out << ' ' << v;
+        }
 		out << " }\n";
 	}
 	return out;

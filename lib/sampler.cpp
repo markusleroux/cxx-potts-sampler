@@ -18,7 +18,7 @@ iteration_t Sampler::iteration() {
 
     // Phase One
     BoundingList A(model.parameters->q);
-    for (int v = 0; v < model.graph.getSize(); v++) {
+    for (int v = 0; v < model.graph.size(); v++) {
         // set A for the neighbourhood of v
         A = model.bs_generateA(v, model.parameters->Delta);
         for (int w : model.graph.getNeighboursIndex(v)) {
@@ -36,7 +36,7 @@ iteration_t Sampler::iteration() {
     int v;
     for (int i = 0; i < phaseTwoIters; i++) {
         // choose v uniformly at random
-        BoundingList bl(model.graph.getSize());
+        BoundingList bl(model.graph.size());
         bl.flip();
         v = bs_uniformSample(bl);
         seeds.emplace_back(ContractUpdate(model, v));

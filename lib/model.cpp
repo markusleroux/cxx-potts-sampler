@@ -4,82 +4,12 @@
 
 #include "sampler.hpp"
 
-BoundingList::BoundingList(const int q, const std::vector<int> &boundingList)
-    : boost::dynamic_bitset<>(static_cast<unsigned long>(q)) {
-    for (int colour : boundingList) {
-        if (colour < 0 || colour >= q) {
-            throw std::invalid_argument("Bounding list must be a subset of {0, ..., q - 1}");
-        }
-
-        set(static_cast<unsigned long>(colour));
-    }
-}
-
-/// unset all bits after the kth set bit
-/// \sa bs_generateA
-/// \param k the number of bits set in after atMostKUp has been applied
-/// \return a copy of bs with all set bits after the kth set bit unset
-void BoundingList::atMostKUp(int k) {
-    for (int i = 0; i < size(); i++) {
-        if (test(static_cast<unsigned long>(i)) && k == 0) {
-            reset(static_cast<unsigned long>(i));
-        } else if (test(static_cast<unsigned long>(i))) {
-            k--;
-        }
-    }
-}
-
-/// Return the union of the bounding lists at all the vertices
-/// \param vertices
-/// \return the bitwise OR of the bounding list bitsets
-BoundingList BoundingList::unionOfLists(const std::vector<BoundingList> &lists, int q) {
-    BoundingList result{q};
-    for (const BoundingList &bl : lists) {
-        result |= bl;
-    }
-    return result;
-}
-
-// \brief analogous to flip but not in place
-BoundingList BoundingList::C() const {
-    BoundingList result{*this};
-    result.flip();
-    return result;
-}
-
-/// Constructor for the model class
-/// \param n the number of vertices
-/// \param q the number of colours
-/// \param Delta the maximum degree of the graph
-/// \param B controls the strength of the interactions between vertices
-/// \param edges
-Model::Model(std::shared_ptr<const Parameters> parameters, const std::vector<edge_t> &edges)
-    : graph(parameters->n, edges), parameters(std::move(parameters)) {
-    // Initialize vector of colours
-    colouring = std::vector<int>(static_cast<unsigned long>(parameters->n));
-
-    // Initialize bounding chain
+Model::Model(std::shared_ptr<const Parameters> parameters, Graph graph)
+        : graph{std::move(graph)}, parameters{std::move(parameters)}, colouring{colouring_t(parameters->n)}
+{
     BoundingList defaultBL(parameters->q);
     defaultBL.set();
-    boundingChain = boundingchain_t(static_cast<unsigned long>(parameters->n), defaultBL);
-}
-
-/// constructor for some generic graphs
-/// \param type type of graph, may be one of {"cycle", "complete"}
-/// \param n the number of vertices in the graph
-/// \param q the number of colours
-/// \param Delta the maximum degree of the graph
-/// \param B the strength of the interactions between vertices
-/// \return a model object
-Model::Model(std::shared_ptr<const Parameters> parameters, const std::string &type)
-    : graph(parameters->n, type), parameters(std::move(parameters)) {
-    // Initialize vector of colours
-    colouring = colouring_t(static_cast<unsigned long>(parameters->n));
-
-    // Initialize bounding chain
-    BoundingList defaultBL(parameters->q);
-    defaultBL.set();
-    boundingChain = boundingchain_t(static_cast<unsigned long>(parameters->n), defaultBL);
+    boundingChain = boundingchain_t(parameters->n, defaultBL);
 }
 
 /// A setter for vertex colour which respects bounding lists when
@@ -96,7 +26,7 @@ void Model::setColour(int v, int c) {
 /// vertex \param v the vertex to consider \return a vector describing the
 /// number of occurrences of each colour in the neighbourhood
 std::vector<int> Model::getNeighbourhoodColourCount(int v) const {
-    std::vector<int> count(static_cast<unsigned long>(parameters->q));
+    std::vector<int> count(parameters->q);
     for (int neighbour : graph.getNeighboursIndex(v)) {
         ++count[getColour(neighbour)];
     }
@@ -219,57 +149,5 @@ BoundingList Model::bs_generateA(int v, int size) const {
 void Model::sample() {
     Sampler sampler(*this);
     sampler.sample();
-}
-
-/// constructor for the graph class
-/// \param n the number of vertices in the graph
-/// \param edges
-Graph::Graph(int n, const std::vector<edge_t> &edges) {
-    // Initialize matrix of size n x n
-    adjacencyMatrix = adjmatrix_t(static_cast<unsigned long>(n), std::vector<bool>(static_cast<unsigned long>(n)));
-
-    // Populate adjacencyMatrix with edges
-    for (const edge_t& edge : edges) {
-        adjacencyMatrix[edge.first][edge.second] = true;
-        adjacencyMatrix[edge.second][edge.first] = true;
-    }
-}
-
-Graph::Graph(int n, const std::string &type) : Graph(n, buildEdgeSet(n, type)) {}
-
-/// helper function for constructing a set of edges
-/// \param n the number of vertices in the graph
-/// \param type the type of the graph (one of cycle, complete)
-std::vector<edge_t> Graph::buildEdgeSet(int n, const std::string &type) {
-    std::vector<edge_t> edges;
-    if (type == "cycle") {
-        for (int i = 0; i + 1 < n; i++) {
-            edges.emplace_back(i, i + 1);
-        }
-        if (n > 2) {
-            edges.emplace_back(n - 1, 0);
-        }
-    } else if (type == "complete") {
-        int j;
-        for (int i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                if (i != j) {
-                    edges.emplace_back(i, j);
-                }
-            }
-        }
-    } else {
-        throw std::invalid_argument("Invalid graph type.");
-    }
-    return edges;
-}
-
-/// return the number of edges in the graph
-int Graph::getEdgeCount() const {
-    int total{0};
-    for (const std::vector<bool> &neighbours : adjacencyMatrix) {
-        total += std::count(neighbours.begin(), neighbours.end(), true);
-    }
-    return total / 2;
 }
 

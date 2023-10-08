@@ -19,11 +19,10 @@ ContractUpdate::ContractUpdate(Model &model, int v) : ContractUpdate(model, v, h
 /// \param m the model to update
 /// \param v the vertex to update
 /// \param c1 the proposal for the new colour of v
-ContractUpdate::ContractUpdate(Model &m, int v, int c1) : Update(m, v, c1) {
-    unfixedCount = static_cast<int>(model.bs_getUnfixedColours(v).count());
-
-    std::vector<long double> weights(static_cast<unsigned long>(model.parameters->q));
-
+ContractUpdate::ContractUpdate(Model &m, int v, int c1)
+        : Update(m, v, c1), unfixedCount{static_cast<int>(model.bs_getUnfixedColours(v).count())}
+{
+    std::vector<long double> weights(model.parameters->q);
     for (int c : model.getFixedColours(v)) {
         weights[c] = pow(model.parameters->B, model.m_Q(v, c));
     }
@@ -41,8 +40,8 @@ int ContractUpdate::handle_c1(Model &m, int v) { return bs_uniformSample(m.bs_ge
 /// compute the cutoff used to choose between c1 and c2
 long double ContractUpdate::colouringGammaCutoff() const {
     std::vector<long double> weights = computeWeights(model.parameters->B, model.getNeighbourhoodColourCount(v));
-    long double Z                    = std::accumulate(weights.begin(), weights.end(), static_cast<long double>(0.0));
-    return pow(model.parameters->B, weights[c1]) * static_cast<long double>(unfixedCount) / Z;
+    long double Z                    = std::accumulate(weights.begin(), weights.end(), 0.0L);
+    return pow(model.parameters->B, weights[c1]) * unfixedCount / Z;
 }
 
 /// compute the cutoff used to set the bounding chain
@@ -94,7 +93,7 @@ CompressUpdate::CompressUpdate(Model &model, int v, int c1, const BoundingList &
 /// \sa updateColouring
 long double CompressUpdate::gammaCutoff() const {
     std::vector<long double> weights = computeWeights(model.parameters->B, model.getNeighbourhoodColourCount(v));
-    long double Z                    = std::accumulate(weights.begin(), weights.end(), static_cast<long double>(0.0));
+    long double Z                    = std::accumulate(weights.begin(), weights.end(), 0.0L);
     return (model.parameters->q - model.parameters->Delta) * weights[c1] / Z;
 }
 
@@ -115,9 +114,9 @@ int CompressUpdate::sampleFromA() const {
     for (int c : getIndexVector<BoundingList>(A)) {
         if (total + weights[c] > tau_x_Denominator) {
             return c;
-        } else {
-            total += weights[c];
         }
+
+        total += weights[c];
     }
 
     throw std::runtime_error("No sample generated from A (likely caused by rounding error).");
@@ -144,3 +143,4 @@ void CompressUpdate::updateBoundingChain() {
     bs |= A;
     model.boundingChain[v] = bs;
 }
+

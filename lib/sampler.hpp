@@ -13,8 +13,8 @@ typedef std::vector<boost::variant<CompressUpdate, ContractUpdate>> iteration_t;
 /// generate the time to run the second phase in order to ensure expected
 /// polynomial run-time
 static int getPhaseTwoIters(const Graph graph, const std::shared_ptr<const Parameters> parameters) {
-    return graph.getSize() + 1 + graph.getEdgeCount() +
-           static_cast<int>(pow(graph.getSize(), 2) *
+    return graph.size() + 1 + graph.numEdges() +
+           static_cast<int>(pow(graph.size(), 2) *
                             (parameters->q - parameters->Delta * (1 - parameters->B) /
                                                    (parameters->q - parameters->Delta * (3 - parameters->B))));
 }

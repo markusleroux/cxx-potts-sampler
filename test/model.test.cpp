@@ -8,8 +8,8 @@ TEST_CASE("graph class", "[Graph]") {
         SECTION("a cycle graph on two vertices") {
             Graph sCycleGraph(2, "cycle");
 
-            REQUIRE(sCycleGraph.getEdgeCount() == 1);
-            REQUIRE(sCycleGraph.getSize() == 2);
+            REQUIRE(sCycleGraph.numEdges() == 1);
+            REQUIRE(sCycleGraph.size() == 2);
             REQUIRE(sCycleGraph.getNeighboursIndex(0) == std::vector<int>{1});
             REQUIRE(sCycleGraph.getNeighboursIndex(1) == std::vector<int>{0});
         }
@@ -17,8 +17,8 @@ TEST_CASE("graph class", "[Graph]") {
         SECTION("a cycle graph on five vertices") {
             Graph mCycleGraph(5, "cycle");
 
-            REQUIRE(mCycleGraph.getEdgeCount() == 5);
-            REQUIRE(mCycleGraph.getSize() == 5);
+            REQUIRE(mCycleGraph.numEdges() == 5);
+            REQUIRE(mCycleGraph.size() == 5);
 
             std::vector<int> neighbours;
             for (int v = 0; v < 5; v++) {
@@ -35,8 +35,8 @@ TEST_CASE("graph class", "[Graph]") {
         SECTION("a complete graph on five vertices") {
             Graph mCompGraph(5, "complete");
 
-            REQUIRE(mCompGraph.getEdgeCount() == 5 * 4 / 2);
-            REQUIRE(mCompGraph.getSize() == 5);
+            REQUIRE(mCompGraph.numEdges() == 5 * 4 / 2);
+            REQUIRE(mCompGraph.size() == 5);
 
             std::vector<int> neighbours;
             std::vector<int> correctNeighbours;

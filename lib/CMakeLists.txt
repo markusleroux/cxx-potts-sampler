@@ -1,7 +1,7 @@
 find_package(Boost REQUIRED)
 
 add_library(libpotts
-    model.cpp
+    model.cpp state.cpp
     update.hpp update.cpp
     sampler.hpp sampler.cpp
     random.hpp random.cpp

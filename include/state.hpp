@@ -11,6 +11,7 @@ struct Parameters {
     long double B;
 };
 
+
 /// template which returns the indices of the set bits
 /// \tparam bitset_t the type of the bitset
 /// \param bs
@@ -25,21 +26,6 @@ static std::vector<int> getIndexVector(const bitset_t &bs) {
     }
     return result;
 }
-
-
-struct BoundingList : boost::dynamic_bitset<> {
-    BoundingList() = default;
-    explicit BoundingList(const int q) : boost::dynamic_bitset<>(q) {}
-    BoundingList(int q, const std::vector<int> &boundingList);
-
-    void atMostKUp(int k);
-    static BoundingList unionOfLists(const std::vector<BoundingList> &lists, int q);
-
-    BoundingList C() const;
-};
-
-using boundingchain_t = std::vector<BoundingList>;
-
 
 class Graph {
    public:
@@ -76,12 +62,26 @@ class Graph {
 };
 
 
-
 using colouring_t = std::vector<int>;
 
+struct BoundingList : boost::dynamic_bitset<> {
+    BoundingList() = default;
+    explicit BoundingList(const int q) : boost::dynamic_bitset<>(q) {}
+    BoundingList(int q, const std::vector<int> &boundingList);
+
+    void atMostKUp(int k);
+    static BoundingList unionOfLists(const std::vector<BoundingList> &lists, int q);
+
+    BoundingList C() const;
+};
+
+using boundingchain_t = std::vector<BoundingList>;
+bool boundingChainIsConstant(const boundingchain_t& boundingChain);
+
+
 struct State {
-    const Graph graph;
     const Parameters parameters;
+    const Graph graph;
 
     colouring_t colouring;
     boundingchain_t boundingChain;

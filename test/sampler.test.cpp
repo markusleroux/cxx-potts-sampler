@@ -1,4 +1,5 @@
 #include <set>
+#include <vector>
 
 #include "catch2/catch.hpp"
 #include "test_interfaces.hpp"
@@ -22,20 +23,20 @@ TEST_CASE("sampler class", "[Sampler]") {
             BoundingList A0(7);
             A0.set(0), A0.set(1), A0.set(2);
 
-            CompressTestInterface comU1(mdl, 1, A0);
-            CompressTestInterface comU4(mdl, 4, A0);
-            ContractTestInterface conU(mdl, 0);
+            CompressUpdate comU1(mdl, 1, A0);
+            CompressUpdate comU4(mdl, 4, A0);
+            ContractUpdate conU(mdl, 0);
 
-            iteration_t seeds{comU1, comU4, conU};
+            Epoch seeds{{comU1, comU4}, {conU}};
             smplr.updateColourWithSeeds_p(seeds);
 
-            REQUIRE(std::set<int>{conU.getC1(), conU.getC2()}.count(mdl.getColour(0)) == 1);
+            REQUIRE(std::set<int>{conU.c1, conU.c2}.count(mdl.getColour(0)) == 1);
 
-            REQUIRE(std::set<int>{0, 1, 2, comU1.getC1()}.count(mdl.getColour(1)) == 1);
-            REQUIRE(std::set<int>{0, 1, 2, comU4.getC1()}.count(mdl.getColour(4)) == 1);
+            REQUIRE(std::set<int>{0, 1, 2, comU1.c1}.count(mdl.getColour(1)) == 1);
+            REQUIRE(std::set<int>{0, 1, 2, comU4.c1}.count(mdl.getColour(4)) == 1);
         }
 
-        SECTION("run an iteration") { REQUIRE_NOTHROW(smplr.iteration_p()); }
+        SECTION("run an iteration") { REQUIRE_NOTHROW(smplr.epoch()); }
 
         SECTION("generate a sample") { REQUIRE_NOTHROW(smplr.sample()); }
     }

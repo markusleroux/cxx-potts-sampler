@@ -10,32 +10,30 @@ std::vector<long double> computeWeights(long double B, std::vector<int> counts) 
     return weights;
 }
 
-/// constructor for Contract update which chooses c1
-/// \param model the model to update
-/// \param v the vertex to update
-ContractUpdate::ContractUpdate(Model &model, int v) : ContractUpdate(model, v, handle_c1(model, v)) {}
+
+int sampleC2(Model &model, int v) {
+    std::vector<long double> weights(model.parameters->q);
+    for (int c : model.getFixedColours(v)) {
+        weights[c] = pow(model.parameters->B, model.m_Q(v, c));
+    }
+
+    return sampleFromDist<long double>(weights);
+}
 
 /// constructor for Contract update which accepts c1
 /// \param m the model to update
 /// \param v the vertex to update
 /// \param c1 the proposal for the new colour of v
 ContractUpdate::ContractUpdate(Model &m, int v, int c1)
-        : Update(m, v, c1), unfixedCount{static_cast<int>(model.bs_getUnfixedColours(v).count())}
-{
-    std::vector<long double> weights(model.parameters->q);
-    for (int c : model.getFixedColours(v)) {
-        weights[c] = pow(model.parameters->B, model.m_Q(v, c));
-    }
-
-    c2 = sampleFromDist<long double>(weights);
-}
+        : Update(m, v, c1), unfixedCount{static_cast<int>(model.bs_getUnfixedColours(v).count())}, c2{sampleC2(m, v)}
+{}
 
 /// choose propose a new colour for the vertex v
 /// \param m the model being updated
 /// \param v the vertex to update
 /// \return a new colour sampled uniformly from the set of unfixed colours at v
 /// \sa Model::bs_getUnfixedColours
-int ContractUpdate::handle_c1(Model &m, int v) { return bs_uniformSample(m.bs_getUnfixedColours(v)); }
+int ContractUpdate::proposeC1(Model &m, int v) { return bs_uniformSample(m.bs_getUnfixedColours(v)); }
 
 /// compute the cutoff used to choose between c1 and c2
 long double ContractUpdate::colouringGammaCutoff() const {
@@ -73,21 +71,6 @@ void ContractUpdate::updateBoundingChain() {
         model.setBoundingList(v, {c1, c2});
     }
 }
-
-/// constructor for initializing a compress update which chooses c1
-/// \param model the model to update
-/// \param v the vertex to update
-/// \param bs_A the set A, common to all the compress updates in a neighbourhood
-/// \sa Model::bs_generateA
-CompressUpdate::CompressUpdate(Model &model, int v, const BoundingList &bs_A)
-    : CompressUpdate(model, v, bs_uniformSample(bs_A.C()), bs_A) {}
-
-/// constructor for initializing a compress update which accepts c1
-/// \param model the model to update
-/// \param v the vertex to update
-/// \param bs_A the set A, common to all the compress updates in a neighbourhood
-/// \sa Model::bs_generateA
-CompressUpdate::CompressUpdate(Model &model, int v, int c1, const BoundingList &bs_A) : Update(model, v, c1), A(bs_A) {}
 
 /// compute the cutoff used to choose between c1 and c2
 /// \sa updateColouring
@@ -139,7 +122,7 @@ void CompressUpdate::updateColouring() {
 /// update the bounding list using the seed
 void CompressUpdate::updateBoundingChain() {
     BoundingList bs(model.parameters->q);
-    bs.set((unsigned long)c1);
+    bs.set(c1);
     bs |= A;
     model.boundingChain[v] = bs;
 }

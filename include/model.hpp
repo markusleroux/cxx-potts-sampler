@@ -1,7 +1,6 @@
 #ifndef POTTSSAMPLER_MODEL_H
 #define POTTSSAMPLER_MODEL_H
 
-#include <boost/dynamic_bitset.hpp>
 #include <iostream>
 #include <memory>
 #include <random>
@@ -30,6 +29,7 @@ class Model {
     std::vector<BoundingList> getBoundingLists(const std::vector<int> &vertices) const;
     BoundingList getBoundingList(int v) const { return boundingChain[v]; }
     std::vector<int> getBoundingListIndex(int v) const { return getIndexVector(getBoundingList(v)); }
+    int m_Q(int v, int c) const;
 
     void sample();
 
@@ -47,7 +47,6 @@ class Model {
     BoundingList bs_getUnfixedColours(int v) const;
     BoundingList bs_getFixedColours(int v) const;
 
-    int m_Q(int v, int c) const;
     void setColour(int v, int c);
 
     /// setter for the checkBoundingList property

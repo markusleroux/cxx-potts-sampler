@@ -4,6 +4,7 @@
 
 #include "sampler.hpp"
 
+
 Model::Model(std::shared_ptr<const Parameters> parameters, Graph graph)
         : graph{std::move(graph)}, parameters{std::move(parameters)}, colouring{colouring_t(parameters->n)}
 {

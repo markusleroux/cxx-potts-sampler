@@ -24,6 +24,8 @@ class Update {
 
    protected:
     Model &model;
+
+   public:
     const int v;
     const int c1;
     const long double gamma = unitSample();
@@ -32,7 +34,7 @@ class Update {
 /// \brief a class for holding contract type updates; used by Sampler class
 class ContractUpdate : public Update {
    public:
-    ContractUpdate(Model &model, int v);
+    ContractUpdate(Model &model, int v) : ContractUpdate(model, v, proposeC1(model, v)) {}
 
    protected:
     ContractUpdate(Model &model, int v, int c1);
@@ -45,19 +47,20 @@ class ContractUpdate : public Update {
     long double colouringGammaCutoff() const;
     long double boundingListGammaCutoff() const;
 
-    static int handle_c1(Model &model, int v);
+    static int proposeC1(Model &model, int v);
 
     int unfixedCount;
-    int c2;
+   public:
+    const int c2;
 };
 
 /// \brief a class for holding compress type updates; used by Sampler class
 class CompressUpdate : public Update {
    public:
-    CompressUpdate(Model &model, int v, const BoundingList &bs_A);
+    CompressUpdate(Model &model, int v, const BoundingList &bs_A) : CompressUpdate(model, v, bs_uniformSample(bs_A.C()), bs_A) {}
 
    protected:
-    CompressUpdate(Model &model, int v, int c1, const BoundingList &bs_A);
+    CompressUpdate(Model &model, int v, int c1, const BoundingList &bs_A) : Update(model, v, c1), A(bs_A) {}
 
    public:
     void updateColouring() override;

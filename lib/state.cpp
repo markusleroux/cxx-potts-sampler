@@ -1,5 +1,6 @@
 #include "state.hpp"
 
+
 BoundingList::BoundingList(const int q, const std::vector<int> &boundingList) : boost::dynamic_bitset<>(q) {
     for (int colour : boundingList) {
         if (colour < 0 || colour >= q) {
@@ -45,6 +46,12 @@ BoundingList BoundingList::C() const {
     result.flip();
     return result;
 }
+
+bool boundingChainIsConstant(const boundingchain_t& boundingChain) {
+    return std::all_of(boundingChain.begin(), boundingChain.end(),
+                       [](const BoundingList &bs) { return bs.count() == 1; });
+}
+
 
 /// constructor for the graph class
 /// \param n the number of vertices in the graph

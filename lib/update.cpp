@@ -1,32 +1,10 @@
-//
-// Created by Markus Le Roux on 2021-01-24.
-//
-
-#include "Update.h"
-
-/// a method for sampling from the uniform distribution on the interval [0, 1]
-long double Update::unitDist() {
-    static std::uniform_real_distribution<double> dist(0.0, 1.0);
-    return dist(Model::mersene_gen);
-}
-
-/// a method for sampling from the uniform distribution over the set bits of a
-/// bitset
-int Update::bs_uniformSample(const BoundingList &bs) {
-    std::vector<int> weights(bs.size(), 0);
-    for (int i = 0; i < bs.size(); i++) {
-        if (bs[i]) {
-            weights[i] = 1;
-        }
-    }
-    return sampleFromDist<int>(weights);
-}
+#include "update.hpp"
 
 /// a method which applies the map c -> B^c to a vector
 /// \param B the base B
 /// \param counts a vector containing the exponent
 /// \return a vector of weights B^c
-std::vector<long double> Update::computeWeights(long double B, std::vector<int> counts) {
+std::vector<long double> computeWeights(long double B, std::vector<int> counts) {
     std::vector<long double> weights(counts.size());
     std::transform(counts.begin(), counts.end(), weights.begin(), [B](int m_c) { return pow(B, m_c); });
     return weights;
@@ -35,19 +13,19 @@ std::vector<long double> Update::computeWeights(long double B, std::vector<int> 
 /// constructor for Contract update which chooses c1
 /// \param model the model to update
 /// \param v the vertex to update
-Contract::Contract(Model &model, int v) : Contract(model, v, handle_c1(model, v)) {}
+ContractUpdate::ContractUpdate(Model &model, int v) : ContractUpdate(model, v, handle_c1(model, v)) {}
 
 /// constructor for Contract update which accepts c1
 /// \param m the model to update
 /// \param v the vertex to update
 /// \param c1 the proposal for the new colour of v
-Contract::Contract(Model &m, int v, int c1) : Update(m, v, c1) {
+ContractUpdate::ContractUpdate(Model &m, int v, int c1) : Update(m, v, c1) {
     unfixedCount = static_cast<int>(model.bs_getUnfixedColours(v).count());
 
-    std::vector<long double> weights(static_cast<unsigned long>(model.q));
+    std::vector<long double> weights(static_cast<unsigned long>(model.parameters->q));
 
     for (int c : model.getFixedColours(v)) {
-        weights[c] = pow(model.B, model.m_Q(v, c));
+        weights[c] = pow(model.parameters->B, model.m_Q(v, c));
     }
 
     c2 = sampleFromDist<long double>(weights);
@@ -58,37 +36,38 @@ Contract::Contract(Model &m, int v, int c1) : Update(m, v, c1) {
 /// \param v the vertex to update
 /// \return a new colour sampled uniformly from the set of unfixed colours at v
 /// \sa Model::bs_getUnfixedColours
-int Contract::handle_c1(Model &m, int v) {
-    return bs_uniformSample(m.bs_getUnfixedColours(v));
-}
+int ContractUpdate::handle_c1(Model &m, int v) { return bs_uniformSample(m.bs_getUnfixedColours(v)); }
 
 /// compute the cutoff used to choose between c1 and c2
-long double Contract::colouringGammaCutoff() const {
-    std::vector<long double> weights = computeWeights(model.B, model.getNeighbourhoodColourCount(v));
-    long double Z = std::accumulate(weights.begin(), weights.end(), (long double)0.0);
-    return (pow(model.B, weights[c1])) * (long double)unfixedCount / Z;
+long double ContractUpdate::colouringGammaCutoff() const {
+    std::vector<long double> weights = computeWeights(model.parameters->B, model.getNeighbourhoodColourCount(v));
+    long double Z                    = std::accumulate(weights.begin(), weights.end(), static_cast<long double>(0.0));
+    return pow(model.parameters->B, weights[c1]) * static_cast<long double>(unfixedCount) / Z;
 }
 
 /// compute the cutoff used to set the bounding chain
-long double Contract::boundingListGammaCutoff() const {
-    return model.bs_getUnfixedColours(v).count() / (model.q - model.Delta * (1 - model.B));
+long double ContractUpdate::boundingListGammaCutoff() const {
+    return model.bs_getUnfixedColours(v).count() /
+           (model.parameters->q - model.parameters->Delta * (1 - model.parameters->B));
 }
 
 /// update the colouring using the seed
 /// \sa colouringGammaCutoff
-void Contract::updateColouring() {
+void ContractUpdate::updateColouring() {
     try {
         model.setColour(v, gamma < colouringGammaCutoff() ? c1 : c2);
     } catch (const std::runtime_error &err) {
-        throw std::runtime_error("Contract update (vertex " + std::to_string(v) + ") failed with exception: " + err.what());
+        throw std::runtime_error("Contract update (vertex " + std::to_string(v) +
+                                 ") failed with exception: " + err.what());
     } catch (const std::invalid_argument &err) {
-        throw std::runtime_error("Contract updated (vertex " + std::to_string(v) + ") failed with invalid_argument:" + err.what());
+        throw std::runtime_error("Contract updated (vertex " + std::to_string(v) +
+                                 ") failed with invalid_argument:" + err.what());
     }
 }
 
 /// update the bounding chain using the seed
 /// \sa boundingListGammaCutoff
-void Contract::updateBoundingChain() {
+void ContractUpdate::updateBoundingChain() {
     if (gamma > boundingListGammaCutoff()) {
         model.setBoundingList(v, {c2});
     } else {
@@ -101,28 +80,27 @@ void Contract::updateBoundingChain() {
 /// \param v the vertex to update
 /// \param bs_A the set A, common to all the compress updates in a neighbourhood
 /// \sa Model::bs_generateA
-Compress::Compress(Model &model, int v, const BoundingList &bs_A)
-    : Compress(model, v, bs_uniformSample(bs_A.C()), bs_A) {}
+CompressUpdate::CompressUpdate(Model &model, int v, const BoundingList &bs_A)
+    : CompressUpdate(model, v, bs_uniformSample(bs_A.C()), bs_A) {}
 
 /// constructor for initializing a compress update which accepts c1
 /// \param model the model to update
 /// \param v the vertex to update
 /// \param bs_A the set A, common to all the compress updates in a neighbourhood
 /// \sa Model::bs_generateA
-Compress::Compress(Model &model, int v, int c1, const BoundingList &bs_A)
-    : Update(model, v, c1), A(bs_A) {}
+CompressUpdate::CompressUpdate(Model &model, int v, int c1, const BoundingList &bs_A) : Update(model, v, c1), A(bs_A) {}
 
 /// compute the cutoff used to choose between c1 and c2
 /// \sa updateColouring
-long double Compress::gammaCutoff() const {
-    std::vector<long double> weights = computeWeights(model.B, model.getNeighbourhoodColourCount(v));
-    long double Z = std::accumulate(weights.begin(), weights.end(), (long double)0.0);
-    return (model.q - model.Delta) * weights[c1] / Z;
+long double CompressUpdate::gammaCutoff() const {
+    std::vector<long double> weights = computeWeights(model.parameters->B, model.getNeighbourhoodColourCount(v));
+    long double Z                    = std::accumulate(weights.begin(), weights.end(), static_cast<long double>(0.0));
+    return (model.parameters->q - model.parameters->Delta) * weights[c1] / Z;
 }
 
 /// generate a sample from the set A
-int Compress::sampleFromA() const {
-    std::vector<long double> weights = computeWeights(model.B, model.getNeighbourhoodColourCount(v));
+int CompressUpdate::sampleFromA() const {
+    std::vector<long double> weights = computeWeights(model.parameters->B, model.getNeighbourhoodColourCount(v));
 
     //	compute the denominator used to determine when to accept a colour as a sample
     long double Z = 0;
@@ -133,7 +111,7 @@ int Compress::sampleFromA() const {
     }
 
     long double tau_x_Denominator = tau * Z;
-    long double total = 0;
+    long double total             = 0;
     for (int c : getIndexVector<BoundingList>(A)) {
         if (total + weights[c] > tau_x_Denominator) {
             return c;
@@ -147,19 +125,21 @@ int Compress::sampleFromA() const {
 
 /// update the colouring using the seed
 /// \sa gammaCutoff
-void Compress::updateColouring() {
+void CompressUpdate::updateColouring() {
     try {
         model.setColour(v, gamma < gammaCutoff() ? c1 : sampleFromA());
     } catch (const std::runtime_error &err) {
-        throw std::runtime_error("Compress update (vertex + " + std::to_string(v) + ") failed with exception: " + err.what());
+        throw std::runtime_error("Compress update (vertex + " + std::to_string(v) +
+                                 ") failed with exception: " + err.what());
     } catch (const std::invalid_argument &err) {
-        throw std::runtime_error("Compress updated (vertex + " + std::to_string(v) + ") failed with invalid_argument:" + err.what());
+        throw std::runtime_error("Compress updated (vertex + " + std::to_string(v) +
+                                 ") failed with invalid_argument:" + err.what());
     }
 }
 
 /// update the bounding list using the seed
-void Compress::updateBoundingChain() {
-    BoundingList bs(model.q);
+void CompressUpdate::updateBoundingChain() {
+    BoundingList bs(model.parameters->q);
     bs.set((unsigned long)c1);
     bs |= A;
     model.boundingChain[v] = bs;

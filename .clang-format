@@ -1,0 +1,38 @@
+BasedOnStyle:  Google
+Language: Cpp
+IndentWidth: 4
+ColumnLimit: 120
+
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments: Consecutive
+AlignTrailingComments: Always
+
+AlwaysBreakTemplateDeclarations: Yes
+
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterStruct: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+
+BreakInheritanceList: BeforeComma
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: LogicalBlock
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+NamespaceIndentation: None
+PointerAlignment: Right
+QualifierAlignment: Left
+ReferenceAlignment: Right
+RemoveSemicolon: true
+SeparateDefinitionBlocks: Always
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeParens: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false

@@ -9,7 +9,7 @@ FetchContent_Declare(
     FIND_PACKAGE_ARGS 3
 )
 
-set(BOOST_INCLUDE_LIBRARIES program_options)
+set(BOOST_INCLUDE_LIBRARIES program_options)  # TODO: program options
 set(BOOST_ENABLE_CMAKE ON)
 FetchContent_Declare(
   Boost
@@ -21,6 +21,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Boost)
 
 option(BUILD_CLI "Build the cli potts sampler tool" ON)
+
 
 project(PottsSampler LANGUAGES CXX)
 

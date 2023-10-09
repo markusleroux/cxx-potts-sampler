@@ -1,18 +1,23 @@
 {
     "version": 6,
     "configurePresets": [
-        { "name": "ninja",       "hidden": true, "generator": "Ninja" },
+        { "name": "_ninja",   "hidden": true, "generator": "Ninja" },
 
-        { "name": "release", "hidden": true, "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } },
-        { "name": "debug",   "hidden": true, "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
+        { "name": "_release", "hidden": true, "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } },
+        { "name": "_debug",   "hidden": true, "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
 
-        { "name": "clang",  "hidden": true, "cacheVariables": { "CMAKE_CXX_COMPILER": "clang++" } },
-        { "name": "ccache", "hidden": true, "cacheVariables": { "CMAKE_CXX_COMPILER_LAUNCHER": "ccache" } },
+        { "name": "_clang",   "hidden": true, "cacheVariables": { "CMAKE_CXX_COMPILER": "clang++" } },
+        { "name": "_ccache",  "hidden": true, "cacheVariables": { "CMAKE_CXX_COMPILER_LAUNCHER": "ccache" } },
 
+        {
+            "name": "release",
+            "description": "Recommended release configuration",
+            "inherits": ["_ninja", "_clang", "_release"]
+        },
         {
             "name": "dev",
             "description": "Recommended development configuration",
-            "inherits": ["ninja", "clang", "ccache", "release"],
+            "inherits": ["_ninja", "_clang", "_ccache", "_release"],
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
@@ -20,7 +25,7 @@
         {
             "name": "dev-debug",
             "description": "Recommended development configuration",
-            "inherits": ["ninja", "clang", "ccache", "debug"],
+            "inherits": ["_ninja", "_clang", "_ccache", "_debug"],
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }

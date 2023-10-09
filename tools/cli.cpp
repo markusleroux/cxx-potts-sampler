@@ -21,7 +21,7 @@ static std::optional<std::pair<Graph::Type, Parameters>> parse_params(int argc, 
         ("help,h", "Display this help message")
         (
             "temperature,T", po::value<long double>(&params.temperature)->default_value(0.95L),
-            "Parameter B controls the strength of interactions; must be in the interval (0, 1)"
+            "The strength of interactions; must be in the interval (0, 1)"
         )
         ("colours,q", po::value<int>(&params.maxColours)->default_value(7),             "Number of colours")
         ("delta,d",   po::value<int>(&params.maxDegree)->default_value(3),              "Maximum degree of graph")
@@ -64,8 +64,9 @@ int main(int argc, char **argv) {
     auto graph                 = Graph(params.numNodes, type);
     std::vector<int> colouring = sample(params, graph);
 
-    for (int v : colouring) {
-        std::cout << v << ' ';
+    std::cout << "| ";
+    for (int i{}; i < colouring.size(); ++i) {
+        std::cout << i << ": " << colouring[i] << " | ";
     }
     std::cout << std::endl;
 

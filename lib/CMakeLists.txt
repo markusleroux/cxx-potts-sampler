@@ -1,5 +1,3 @@
-find_package(Boost REQUIRED)
-
 add_library(libpotts
     sampler.cpp
     state.hpp state.cpp

@@ -31,7 +31,7 @@ bool Parameters::verify() const {
         failed |= true;
     }
 
-    return failed;
+    return !failed;
 }
 
 /*************************************
@@ -142,7 +142,7 @@ std::vector<int> sample(const Parameters &parameters, const Graph &graph) {
 
     State state{.parameters    = parameters,
                 .graph         = graph,
-                .colouring     = colouring_t{colouring_t(parameters.numNodes)},
+                .colouring     = colouring_t(parameters.numNodes),
                 .boundingChain = boundingchain_t(parameters.numNodes, defaultBL)};
     sample(state);
     return state.colouring;

@@ -40,12 +40,12 @@ BoundingList BoundingList::flip_copy() const {
     return result;
 }
 
+namespace queries {
 bool boundingChainIsConstant(const boundingchain_t& boundingChain) {
     return std::all_of(boundingChain.begin(), boundingChain.end(),
                        [](const BoundingList& bs) { return bs.count() == 1; });
 }
 
-namespace queries {
 BoundingList getUnfixedColours(const Graph& graph, const Parameters& parameters, const boundingchain_t& boundingChain,
                                int v) {
     // initialize result, noting that if a vertex has no neighbours then this

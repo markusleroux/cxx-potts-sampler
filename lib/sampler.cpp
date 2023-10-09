@@ -122,11 +122,19 @@ struct Epoch {
 };
 
 static int getPhaseTwoIters(const Graph &graph, const Parameters &parameters);
-void update(State &state, const Update &update);
-void updateColouring(State &state, const Update &update);
-Epoch epoch(State &model, int phaseTwoIters);
+
+void update(State &state, const ContractUpdate &update);
+void update(State &state, const CompressUpdate &update);
+
+void updateColouring(State &state, const ContractUpdate &update);
+void updateColouring(State &state, const CompressUpdate &update);
+
 void updateColourWithEpoch(State &model, Epoch &epoch);
-std::vector<int> sample(const State &state);
+
+Epoch epoch(State &model, int phaseTwoIters);
+
+void sample(State &state);
+
 
 std::vector<int> sample(const Parameters &parameters, const Graph &graph) {
     BoundingList defaultBL(parameters.maxColours);

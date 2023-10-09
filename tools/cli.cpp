@@ -17,7 +17,7 @@ static std::pair<Graph::Type, Parameters> parse_params(int argc, char **argv) {
     description.add_options()
         ("help,h", "Display this help message")
         (
-            "temperature,T", po::value<long double>()->default_value(0.95L),
+            "temperature,T", po::value<long double>()->default_value(0.95),
             "Parameter B controls the strength of interactions; must be in the interval (0, 1)"
         )
         ("colours,q", po::value<int>()->required(), "Number of colours")

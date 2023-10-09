@@ -37,7 +37,7 @@ int sampleC2(const State &state, int v) {
 /// \param v the vertex to update
 /// \param c1 the proposal for the new colour of v
 ContractUpdate::ContractUpdate(const State &m, int v, int c1)
-    : Update(m, v, c1),
+    : Update{m, v, c1},
       unfixedCount{
           static_cast<int>(queries::getUnfixedColours(state.graph, state.parameters, state.boundingChain, v).count())},
       c2{sampleC2(m, v)} {}

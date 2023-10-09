@@ -9,11 +9,7 @@
 
 std::vector<long double> pow(long double temperature, std::vector<int> counts);
 
-class Update {
-   protected:
-    Update(const State &m, int v, int c1) : v(v), c1(c1), state(m) {}
-
-   public:
+struct Update {
     const State &state;
     const int v;
     const int c1;
@@ -55,7 +51,7 @@ class CompressUpdate : public Update {
         : CompressUpdate(state, v, uniformSample(bs_A.flip_copy()), bs_A) {}
 
    protected:
-    CompressUpdate(const State &state, int v, int c1, const BoundingList &bs_A) : Update(state, v, c1), A(bs_A) {}
+    CompressUpdate(const State &state, int v, int c1, const BoundingList &bs_A) : Update{state, v, c1}, A(bs_A) {}
 
    public:
     int getNewColour() const { return gamma < gammaCutoff() ? c1 : sampleFromA(); }

@@ -38,31 +38,13 @@ bool Parameters::verify() const {
  * Graph
  *************************************/
 
-Graph::Graph(int numNodes, const std::vector<edge_t> &edges) {
-    // Initialize matrix of size n x n
-    adjacencyMatrix = std::vector<std::vector<int>>(numNodes, std::vector<int>());
-
-    // Populate adjacencyMatrix with edges
+Graph::Graph(int numNodes, const std::vector<edge_t> &edges)
+        : adjacencyMatrix{std::vector<std::vector<int>>(numNodes, std::vector<int>())}
+{
     for (const edge_t &edge : edges) {
         adjacencyMatrix[edge.first].emplace_back(edge.second);
         adjacencyMatrix[edge.second].emplace_back(edge.first);
     }
-}
-
-int Graph::numEdges() const {
-    return std::accumulate(adjacencyMatrix.begin(), adjacencyMatrix.end(), 0,
-                           [](int acc, const auto &neighbours) { return neighbours.size(); }) /
-           2;
-}
-
-std::ostream &operator<<(std::ostream &out, const Graph &graph) {
-    for (int v = 0; v < graph.size(); v++) {
-        out << v << ": {";
-        for (auto n : graph.getNeighbours(v)) {
-            out << "}" << std::endl;
-        }
-    }
-    return out;
 }
 
 /// helper function for constructing a set of edges
@@ -84,7 +66,7 @@ std::vector<Graph::edge_t> Graph::buildEdgeSet(int n, Graph::Type type) {
         case Type::COMPLETE:
             int j;
             for (int i = 0; i < n; i++) {
-                for (j = 0; j < n; j++) {
+                for (j = 0; j < i; j++) {
                     if (i != j) {
                         edges.emplace_back(i, j);
                     }
@@ -95,7 +77,22 @@ std::vector<Graph::edge_t> Graph::buildEdgeSet(int n, Graph::Type type) {
         default:
             throw std::invalid_argument("Invalid graph type.");
     }
-    return edges;
+}
+
+int Graph::numEdges() const {
+    return std::accumulate(adjacencyMatrix.begin(), adjacencyMatrix.end(), 0,
+                           [](int acc, const auto &neighbours) { return acc + neighbours.size(); }) /
+           2;
+}
+
+std::ostream &operator<<(std::ostream &out, const Graph &graph) {
+    for (int v = 0; v < graph.size(); v++) {
+        out << v << ": {";
+        for (auto n : graph.getNeighbours(v)) {
+            out << "}" << std::endl;
+        }
+    }
+    return out;
 }
 
 std::istream& operator>>(std::istream& is, Graph::Type& type) {

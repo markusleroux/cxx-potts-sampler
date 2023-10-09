@@ -9,11 +9,9 @@
 #include "sampler.hpp"
 
 struct BoundingList : boost::dynamic_bitset<> {
-    BoundingList() = default;
+    explicit BoundingList(const int maxColours) : boost::dynamic_bitset<>(maxColours) {}
 
-    explicit BoundingList(const int q) : boost::dynamic_bitset<>(q) {}
-
-    BoundingList(int q, const std::vector<int> &boundingList);
+    BoundingList(int maxColours, const std::vector<int> &boundingList);
 
     void makeAtMostKSet(int k);
     BoundingList flip_copy() const;

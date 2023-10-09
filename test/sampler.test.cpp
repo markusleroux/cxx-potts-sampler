@@ -36,7 +36,7 @@ TEST_CASE("sampler class", "[Sampler]") {
             REQUIRE(std::set<int>{0, 1, 2, comU4.c1}.count(mdl.getColour(4)) == 1);
         }
 
-        SECTION("run an iteration") { REQUIRE_NOTHROW(smplr.epoch()); }
+        SECTION("run an iteration") { REQUIRE_NOTHROW(smplr.epoch_p()); }
 
         SECTION("generate a sample") { REQUIRE_NOTHROW(smplr.sample()); }
     }

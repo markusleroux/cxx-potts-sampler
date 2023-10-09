@@ -12,14 +12,14 @@ TEST_CASE("update class", "[Update]") {
             BoundingList bl(7);
             bl.set(1), bl.set(3), bl.set(5);
             for (int i = 0; i < 10; i++) {
-                CHECK(std::set{1, 3, 5}.count(bs_uniformSample(bl)) == 1);
+                CHECK(std::set{1, 3, 5}.count(uniformSample(bl)) == 1);
             }
         }
 
         SECTION("compute weights") {
             std::vector<int> counts{0, 1, 2, 3};
             std::vector<long double> result{1, 0.5, 0.25, 0.125};
-            CHECK(UpdateTestInterface::computeWeights_p(0.5, counts) == result);
+            CHECK(computeWeights(0.5, counts) == result);
         }
     }
 }

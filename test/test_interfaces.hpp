@@ -14,14 +14,6 @@ struct ModelTestInterface : Model {
     void setBoundingList_p(int v, const std::vector<int> &boundingList) { setBoundingList(v, boundingList); }
 };
 
-
-struct UpdateTestInterface : Update {
-    static std::vector<long double> computeWeights_p(long double B, std::vector<int> counts) {
-        return computeWeights(B, counts);
-    }
-};
-
-
 struct SamplerTestInterface : Sampler {
     explicit SamplerTestInterface(Model &model) : Sampler(model) {}
 
@@ -29,5 +21,5 @@ struct SamplerTestInterface : Sampler {
 
     bool boundingChainIsConstant_p() const { return boundingChainIsConstant(model.getBoundingChain()); }
 
-    Epoch epoch() { return epoch(); }
+    Epoch epoch_p() { return epoch_p(); }
 };

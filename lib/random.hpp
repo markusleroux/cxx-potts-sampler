@@ -5,7 +5,6 @@
 #include <random>
 
 extern std::mt19937 mersene_gen;
-extern std::uniform_real_distribution<double> dist;
 
 /// template for sampling from the distribution described by weights
 /// \tparam weight_type the type of the elements of weights
@@ -18,11 +17,10 @@ int sampleFromDist(const std::vector<weight_type> &weights) {
     return dist(mersene_gen);
 }
 
-/// a method for sampling from the uniform distribution over the set bits of a
-/// bitset
-int bs_uniformSample(const boost::dynamic_bitset<> &bs);
+/// select random set bit
+int uniformSample(const boost::dynamic_bitset<> &bs);
 
-/// a method for sampling from the uniform distribution over the interval [0, 1]
+/// sample from the uniform distribution over the interval [0, 1]
 long double unitSample();
 
 #endif  // POTTSSAMPLER_RANDOM_H

@@ -1,9 +1,13 @@
 #include "state.hpp"
 
+/*************************************
+ * Bounding List
+ *************************************/
 
-BoundingList::BoundingList(const int q, const std::vector<int> &boundingList) : boost::dynamic_bitset<>(q) {
+BoundingList::BoundingList(const int maxColours, const std::vector<int>& boundingList)
+    : boost::dynamic_bitset<>(maxColours) {
     for (int colour : boundingList) {
-        if (colour < 0 || colour >= q) {
+        if (colour < 0 || colour >= maxColours) {
             throw std::invalid_argument("Bounding list must be a subset of {0, ..., q - 1}");
         }
 
@@ -15,7 +19,7 @@ BoundingList::BoundingList(const int q, const std::vector<int> &boundingList) : 
 /// \sa bs_generateA
 /// \param k the number of bits set in after atMostKUp has been applied
 /// \return a copy of bs with all set bits after the kth set bit unset
-void BoundingList::atMostKUp(int k) {
+void BoundingList::makeAtMostKSet(int k) {
     for (int i = 0; i < size(); i++) {
         if (!test(i)) {
             continue;
@@ -29,19 +33,8 @@ void BoundingList::atMostKUp(int k) {
     }
 }
 
-/// Return the union of the bounding lists at all the vertices
-/// \param vertices
-/// \return the bitwise OR of the bounding list bitsets
-BoundingList BoundingList::unionOfLists(const std::vector<BoundingList> &lists, int q) {
-    BoundingList result{q};
-    for (const BoundingList &bl : lists) {
-        result |= bl;
-    }
-    return result;
-}
-
 // \brief analogous to flip but not in place
-BoundingList BoundingList::C() const {
+BoundingList BoundingList::flip_copy() const {
     BoundingList result{*this};
     result.flip();
     return result;
@@ -49,57 +42,83 @@ BoundingList BoundingList::C() const {
 
 bool boundingChainIsConstant(const boundingchain_t& boundingChain) {
     return std::all_of(boundingChain.begin(), boundingChain.end(),
-                       [](const BoundingList &bs) { return bs.count() == 1; });
+                       [](const BoundingList& bs) { return bs.count() == 1; });
 }
 
+namespace queries {
+BoundingList getUnfixedColours(const Graph& graph, const Parameters& parameters, const boundingchain_t& boundingChain,
+                               int v) {
+    // initialize result, noting that if a vertex has no neighbours then this
+    // correctly defaults to all unset
+    BoundingList result(parameters.maxColours);
+    BoundingList boundingList(parameters.maxColours);
 
-/// constructor for the graph class
-/// \param n the number of vertices in the graph
-/// \param edges
-Graph::Graph(int n, const std::vector<edge_t> &edges) {
-    // Initialize matrix of size n x n
-    adjacencyMatrix = std::vector<std::vector<bool>>(n, std::vector<bool>(n));
-
-    // Populate adjacencyMatrix with edges
-    for (const edge_t& edge : edges) {
-        adjacencyMatrix[edge.first][edge.second] = true;
-        adjacencyMatrix[edge.second][edge.first] = true;
-    }
-}
-
-/// helper function for constructing a set of edges
-/// \param n the number of vertices in the graph
-/// \param type the type of the graph (one of cycle, complete)
-std::vector<Graph::edge_t> Graph::buildEdgeSet(int n, const std::string &type) {
-    std::vector<edge_t> edges;
-    if (type == "cycle") {
-        for (int i = 0; i + 1 < n; i++) {
-            edges.emplace_back(i, i + 1);
+    for (int neighbour : graph.getNeighbours(v)) {
+        boundingList = boundingChain[neighbour];
+        if (boundingList.count() <= 1) {
+            continue;
         }
-        if (n > 2) {
-            edges.emplace_back(n - 1, 0);
+        for (int colour = 0; colour < parameters.maxColours; colour++) {
+            result[colour] = boundingList[colour];
         }
-    } else if (type == "complete") {
-        int j;
-        for (int i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                if (i != j) {
-                    edges.emplace_back(i, j);
-                }
-            }
-        }
-    } else {
-        throw std::invalid_argument("Invalid graph type.");
     }
-    return edges;
+
+    return result;
 }
 
-/// return the number of edges in the graph
-int Graph::numEdges() const {
-    int total{0};
-    for (const std::vector<bool> &neighbours : adjacencyMatrix) {
-        total += std::count(neighbours.begin(), neighbours.end(), true);
-    }
-    return total / 2;
+BoundingList getFixedColours(const Graph& graph, const Parameters& parameters, const boundingchain_t& boundingChain,
+                             int v) {
+    auto fixedColours = getUnfixedColours(graph, parameters, boundingChain, v);
+    fixedColours.flip();
+    return fixedColours;
 }
 
+std::vector<int> getNeighbourhoodColourCount(const Graph& graph, const Parameters& parameters,
+                                             const colouring_t& colouring, int v) {
+    std::vector<int> count(parameters.maxColours);
+    for (int neighbour : graph.getNeighbours(v)) {
+        ++count[colouring[neighbour]];
+    }
+    return count;
+}
+
+BoundingList getA(const Graph& graph, const Parameters& parameters, const boundingchain_t& boundingChain, int v,
+                  int size) {
+    std::vector<int> vertices = graph.getNeighbours(v);
+
+    //	remove neighbours which are less than v
+    vertices.erase(std::remove_if(vertices.begin(), vertices.end(), [v](int w) { return w < v; }), vertices.end());
+
+    BoundingList A{parameters.maxColours};
+    for (int vertex : vertices) {
+        A |= boundingChain[vertex];
+    }
+
+    //	ensure A has size at most size
+    A.makeAtMostKSet(size);
+
+    //	add more colours if A is smaller than size
+    for (int colour = 0, count = static_cast<int>(A.count()); size - count > 0; count++) {
+        while (A[colour]) {
+            colour++;
+        }
+        A.flip(colour);
+    }
+
+    return A;
+}
+
+int m_Q(const Graph& graph, const Parameters& parameters, const boundingchain_t& boundingChain, int v, int c) {
+    int Q = 0;
+    BoundingList boundingList(parameters.maxColours);
+
+    for (int neighbour : graph.getNeighbours(v)) {
+        boundingList = boundingChain[neighbour];
+        if (boundingList.count() == 1 && boundingList[c]) {
+            Q++;
+        }
+    }
+
+    return Q;
+}
+}  // namespace queries

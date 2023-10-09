@@ -73,13 +73,13 @@ TEST_CASE("bounding lists class", "[BoundingList]") {
         }
 
         SECTION("at most k bits are up") {
-            bl2.atMostKUp(1);
+            bl2.makeAtMostKSet(1);
             CHECK(bl2 == bl1);
         }
 
         SECTION("complement") {
             BoundingList bl3(5, std::vector<int>{0, 2, 3, 4});
-            CHECK(bl1.C() == bl3);
+            CHECK(bl1.flip_copy() == bl3);
         }
 
         SECTION("finite union") {
@@ -87,7 +87,11 @@ TEST_CASE("bounding lists class", "[BoundingList]") {
             std::vector<BoundingList> ubl{bl1, bl2, bl3};
             BoundingList bl4(5, std::vector<int>{1, 2, 3});
 
-            CHECK(BoundingList::unionOfLists(ubl, 5) == bl4);
+            BoundingList un{5};
+            for (const BoundingList &bl : ubl) {
+                un |= bl;
+            }
+            CHECK(un == bl4);
         }
     }
 }

@@ -14,7 +14,7 @@ TEST_CASE("helpers", "[Update]") {
 }
 
 TEST_CASE("compress class", "[Compress]") {
-    auto params = Parameters{5, 7, 3, 0.99};
+    auto params = Parameters{5, 7, 0.99};
     auto graph = Graph(params.numNodes, Graph::Type::CYCLE);
     BoundingList defaultBL(params.maxColours);
     defaultBL.set();
@@ -46,7 +46,7 @@ TEST_CASE("compress class", "[Compress]") {
 }
 
 TEST_CASE("contract class", "[Contract]") {
-    auto params = Parameters{5, 7, 3, 0.99};
+    auto params = Parameters{5, 7, 0.99};
     auto graph = Graph(params.numNodes, Graph::Type::CYCLE);
     BoundingList defaultBL(params.maxColours);
     defaultBL.set();

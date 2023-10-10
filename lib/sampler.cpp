@@ -6,16 +6,16 @@
  * Parameters
  *************************************/
 
-bool Parameters::verify() const {
+bool Parameters::verify(const Graph& graph) const {
     bool failed = false;
 
-    if (maxDegree < 3) {
+    if (graph.getMaxDegree() < 3) {
         std::cout << "Delta must be greater than 2." << std::endl;
         failed |= true;
     }
 
-    if (maxColours <= 2 * maxDegree) {
-        std::cout << "The number of colours q must be greater than 2 * Delta." << std::endl;
+    if (maxColours <= 2 * graph.getMaxDegree()) {
+        std::cout << "The number of colours q must be greater than 2 * Delta. Delta is " << graph.getMaxDegree() << '.' << std::endl;
         failed |= true;
     }
 
@@ -24,7 +24,7 @@ bool Parameters::verify() const {
         failed |= true;
     }
 
-    if (const long double min_B = 1 - static_cast<long double>(maxColours - 2 * maxDegree) / maxDegree;
+    if (const long double min_B = 1 - static_cast<long double>(maxColours - 2 * graph.getMaxDegree()) / graph.getMaxDegree();
         temperature <= min_B) {
         std::cout << "B, Delta and q must satisfy B > 1 - (q - 2 * Delta) / Delta, i.e. B > " << std::to_string(min_B)
                   << std::endl;
@@ -44,6 +44,10 @@ Graph::Graph(int numNodes, const std::vector<edge_t> &edges)
     for (const edge_t &edge : edges) {
         adjacencyMatrix[edge.first].emplace_back(edge.second);
         adjacencyMatrix[edge.second].emplace_back(edge.first);
+    }
+
+    for (int node{}; node < adjacencyMatrix.size(); ++node) {
+        maxDegree = std::max(maxDegree, static_cast<int>(adjacencyMatrix[node].size()));
     }
 }
 
@@ -133,7 +137,11 @@ Epoch epoch(State &model, int phaseTwoIters);
 void sample(State &state);
 
 
-std::vector<int> sample(const Parameters &parameters, const Graph &graph) {
+std::optional<std::vector<int>> sample(const Parameters &parameters, const Graph &graph) {
+    if (!parameters.verify(graph)) {
+        return std::nullopt;
+    }
+
     BoundingList defaultBL(parameters.maxColours);
     defaultBL.set();
 
@@ -142,7 +150,7 @@ std::vector<int> sample(const Parameters &parameters, const Graph &graph) {
                 .colouring     = colouring_t(parameters.numNodes),
                 .boundingChain = boundingchain_t(parameters.numNodes, defaultBL)};
     sample(state);
-    return state.colouring;
+    return {state.colouring};
 }
 
 void sample(State &state) {
@@ -170,7 +178,7 @@ Epoch epoch(State &state, int phaseTwoIters) {
     BoundingList A(state.parameters.maxColours);
     for (int v = 0; v < state.graph.size(); v++) {
         // set A for the neighbourhood of v
-        A = queries::getA(state.graph, state.parameters, state.boundingChain, v, state.parameters.maxDegree);
+        A = queries::getA(state.graph, state.parameters, state.boundingChain, v, state.graph.getMaxDegree());
         for (int w : state.graph.getNeighbours(v)) {
             if (w > v) {
                 epoch.phaseOneHistory.emplace_back(state, w, A);
@@ -199,8 +207,8 @@ Epoch epoch(State &state, int phaseTwoIters) {
 static int getPhaseTwoIters(const Graph &graph, const Parameters &parameters) {
     return graph.size() + 1 + graph.numEdges() +
            pow(graph.size(), 2) * (parameters.maxColours -
-                                   parameters.maxDegree * (1 - parameters.temperature) /
-                                       (parameters.maxColours - parameters.maxDegree * (3 - parameters.temperature)));
+                                   graph.getMaxDegree() * (1 - parameters.temperature) /
+                                       (parameters.maxColours - graph.getMaxDegree() * (3 - parameters.temperature)));
 }
 
 // TODO: concept would be useful to remove this duplication

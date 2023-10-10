@@ -16,6 +16,7 @@ TEST_CASE("graph class", "[Graph]") {
             REQUIRE(sCycleGraph.numEdges() == 1);
             REQUIRE(sCycleGraph.getNeighbours(0) == std::vector<int>{1});
             REQUIRE(sCycleGraph.getNeighbours(1) == std::vector<int>{0});
+            REQUIRE(sCycleGraph.getMaxDegree() == 1);
         }
 
         SECTION("a cycle graph on five vertices") {
@@ -32,6 +33,7 @@ TEST_CASE("graph class", "[Graph]") {
                 std::set<int> correctNeighbours{(v + numNodes - 1) % numNodes, (v + 1) % numNodes};
                 REQUIRE(neighbours == correctNeighbours);
             }
+            REQUIRE(mCycleGraph.getMaxDegree() == 2);
         }
 
         SECTION("a complete graph on five vertices") {
@@ -54,13 +56,14 @@ TEST_CASE("graph class", "[Graph]") {
 
                 REQUIRE(neighbours == correctNeighbours);
             }
+            REQUIRE(mCompGraph.getMaxDegree() == 4);
         }
     }
 }
 
 
 TEST_CASE("sampler class", "[Sampler]") {
-    auto params = Parameters{5, 7, 3, 0.95};
+    auto params = Parameters{5, 7, 0.95};
     auto graph = Graph(params.numNodes, Graph::Type::CYCLE);
 
     SECTION("methods") {

@@ -63,7 +63,7 @@ long double ContractUpdate::colouringGammaCutoff() const {
 /// compute the cutoff used to set the bounding chain
 long double ContractUpdate::boundingListGammaCutoff() const {
     return unfixedCount /
-           (state.parameters.maxColours - state.parameters.maxDegree * (1 - state.parameters.temperature));
+           (state.parameters.maxColours - state.graph.getMaxDegree() * (1 - state.parameters.temperature));
 }
 
 /*************************************
@@ -77,7 +77,7 @@ long double CompressUpdate::gammaCutoff() const {
         pow(state.parameters.temperature,
             queries::getNeighbourhoodColourCount(state.graph, state.parameters, state.colouring, v));
     long double norm = std::accumulate(weights.begin(), weights.end(), 0.0L);
-    return (state.parameters.maxColours - state.parameters.maxDegree) * weights[c1] / norm;
+    return (state.parameters.maxColours - state.graph.getMaxDegree()) * weights[c1] / norm;
 }
 
 /// generate a sample from the set A

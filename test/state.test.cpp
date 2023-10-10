@@ -53,7 +53,7 @@ TEST_CASE("bounding list class", "[BoundingList]") {
 
 
 TEST_CASE("queries", "[Queries]") {
-    auto params = Parameters{5, 7, 3, 0.99};
+    auto params = Parameters{5, 7, 0.99};
     auto graph = Graph(params.numNodes, Graph::Type::CYCLE);
     BoundingList defaultBL(params.maxColours);
     defaultBL.set();

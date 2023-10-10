@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <optional>
+
+class Graph;
 
 struct Parameters {
     // Number of nodes in the graph
@@ -12,13 +15,10 @@ struct Parameters {
     // Number of distinct colours
     int maxColours;
 
-    // Maximum degree
-    int maxDegree;
-
     // Temperature
     long double temperature;
 
-    bool verify() const;
+    bool verify(const Graph&) const;
 };
 
 class Graph {
@@ -35,6 +35,8 @@ class Graph {
 
     int numEdges() const;
 
+    int getMaxDegree() const { return maxDegree; }
+
     const std::vector<int>& getNeighbours(int v) const { return adjacencyMatrix[v]; }
 
     friend std::ostream& operator<<(std::ostream& out, const Graph& graph);
@@ -43,6 +45,7 @@ class Graph {
     static std::vector<edge_t> buildEdgeSet(int n, Type type);
 
     std::vector<std::vector<int>> adjacencyMatrix;
+    int maxDegree = 3;
 };
 
 std::istream& operator>>(std::istream& is, Graph::Type& type);
@@ -50,6 +53,6 @@ std::istream& operator>>(std::istream& is, Graph::Type& type);
 using colouring_t = std::vector<int>;
 
 /// sample from the anti-ferromagnetic Potts model
-colouring_t sample(const Parameters& parameters, const Graph& graph);
+std::optional<colouring_t> sample(const Parameters& parameters, const Graph& graph);
 
 #endif

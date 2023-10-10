@@ -24,8 +24,7 @@ static std::optional<std::pair<Graph::Type, Parameters>> parse_params(int argc, 
             "The strength of interactions; must be in the interval (0, 1)"
         )
         ("colours,q", po::value<int>(&params.maxColours)->default_value(7),             "Number of colours")
-        ("delta,d",   po::value<int>(&params.maxDegree)->default_value(3),              "Maximum degree of graph")
-        ("number,n",  po::value<int>(&params.numNodes)->default_value(10),              "Number of vertices")
+        ("vertices,v",  po::value<int>(&params.numNodes)->default_value(10),            "Number of vertices")
         ("type,t",    po::value<Graph::Type>(&type)->default_value(Graph::Type::CYCLE), "Type of graph");
 
     // parse arguments and save them in the variable map (vm)
@@ -57,12 +56,12 @@ int main(int argc, char **argv) {
     //  note that the algorithm still works if B is not in the correct interval,
     //  but there is no guarantee
     auto [type, params] = std::move(paramsMb.value());
-    if (!params.verify()) {
+    auto graph                 = Graph(params.numNodes, type);
+    std::optional<colouring_t> colouringMb = sample(params, graph);
+    if (!colouringMb) {
         return 1;
     }
-
-    auto graph                 = Graph(params.numNodes, type);
-    std::vector<int> colouring = sample(params, graph);
+    colouring_t colouring = *colouringMb;
 
     std::cout << "| ";
     for (int i{}; i < colouring.size(); ++i) {

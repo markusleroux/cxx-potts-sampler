@@ -25,6 +25,12 @@ The CLI can be built by passing `-DBUILD_CLI` to the configure stage. Once built
 
 For example, the following generates a sample from the model with 5 colours, temperature 0.95, maximum degree (delta) 3 on the cyclic graph with 5 vertices:
 ```bash
-> potts-sampler --temperature 0.95 --colours 7 --vertices 10 --type cycle
+potts-sampler --temperature 0.95 --colours 7 --vertices 10 --type cycle
 ```
 
+## TODO
+- [ ] visualize graphs with colourings
+- [ ] control the seed
+- [ ] make graph a concept class to allow user types?
+- [ ] multi-thread at a per-epoch granularity
+- [ ] improve test coverage and test across a suite of compilers, build generators and dependency versions
